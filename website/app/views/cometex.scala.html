@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+<script type="text/javascript">
+    var cometMessage = function(event) {
+    console.log('Received event: ' + event)
+    }
+</script>
+
+<iframe src="/comet"></iframe>
+
+
+@helper.form(action = controllers.website.routes.Application.index, 'enctype -> "multipart/form-data") {
+
+    <input type="file" name="picture">
+
+    <p>
+        <input type="submit">
+    </p>
+
+}
+
+</body>
+</html>

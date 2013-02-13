@@ -1,0 +1,20 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.website.Application.index
+GET     /hello/                     controllers.website.Application.hello(name = "no name def")
+GET     /hello/:name                controllers.website.Application.hello(name:String)
+GET     /stream                     controllers.website.Application.stream
+GET     /comet                      controllers.website.Application.comet
+GET     /comet2                     controllers.website.Application.comet2
+GET     /cometEx                    controllers.website.Application.cometEx
+GET     /uploadForm                 controllers.website.Application.uploadForm
+POST    /upload                     controllers.website.Application.upload
+
+GET     /ingredients                controllers.website.Application.ingredients
+GET     /recette                    controllers.website.Application.recette
+
+## Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.website.Assets.at(path="/public", file)

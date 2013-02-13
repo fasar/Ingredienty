@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload a file</title>
+</head>
+<body>
+@helper.form(action = controllers.website.routes.Application.upload, 'enctype -> "multipart/form-data", 'method -> "POST", 'class -> "MyUpload") {
+    <input type="file" name="picture">
+    <p>
+        <input type="submit">
+    </p>
+}
+
+</body>
+</html>
