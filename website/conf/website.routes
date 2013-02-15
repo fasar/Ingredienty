@@ -14,7 +14,13 @@ GET     /uploadForm                 controllers.website.Application.uploadForm
 POST    /upload                     controllers.website.Application.upload
 
 GET     /ingredients                controllers.website.Application.ingredients
+GET     /ingredients/startwith.json      controllers.website.Application.ingredientsQuery
+GET     /ingredient/:id/apports.json     controllers.website.Application.ingredientApports(id:Long)
+GET     /ingredient/cherche         controllers.website.Application.ingredientCherche
+GET     /plat/nouveau               controllers.website.Application.newPlat
 GET     /recette                    controllers.website.Application.recette
 
+
+
 ## Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.website.Assets.at(path="/public", file)
+GET     /myassets/*file             controllers.website.Assets.at(path="/public", file)

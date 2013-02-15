@@ -3,7 +3,6 @@
 # ~~~~
 
 # Home page
-GET    /help                      controllers.website.Application.index
+GET    /help                      controllers.Application.index
 ->     /                           website.Routes
-
 

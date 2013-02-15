@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Créateur de plat</title>
+    <link rel="shortcut icon" type="image/png" href="http://localhost:9000/public/images/favicon.png">
+    @includeScripts()
+
+    <script>
+        
+    var curId = 2;
+    function actionOnEnterKey(event) {
+        if (event.keyCode == 13) {
+            var ingredientKey = $('#ingredientToAdd').get(0).value
+            majIngredientLine(ingredientKey, curId);
+            curId=curId+1;
+        }
+    }
+        
+    function newInputFiledIngredient(id) {
+        var res = '<tr id="ingredient'+id+'"> \
+            <td class="id">id'+id+'</td> \
+            <td class="ingredientName">nom</td> \
+            <td class="family">famille</td> \
+            <td class="glucides">glucides</td> \
+            <td class="lipides">lipides</td> \
+            <td class="proteines">protéines</td> \
+            </tr>';
+        var len = $('#listIngredients > tbody > tr').length;
+        $('#listIngredients > tbody > tr').eq(len-1).after(res);  
+    }
+
+   
+    
+    function majIngredientLine(ingredientKey, lineId) {
+        var url = "/ingredient/"+ingredientKey+"/apports.json";
+        $.ajax({ url: url,
+            dataType:"json",
+            success: function(data) {
+                newInputFiledIngredient(lineId);
+                updateIngredientLine(data, lineId);
+                updateCalcAll();
+            }
+        });
+    }
+    
+    function updateIngredientLine(ingredientObj, lineId) {
+        var ingredientId = 'ingredient' + lineId;
+        $('tr#' + ingredientId + ' > td.id').get(0).firstChild.nodeValue = ingredientObj.id;
+        $('tr#' + ingredientId + ' > td.ingredientName').get(0).firstChild.nodeValue = ingredientObj.name;
+        $('tr#' + ingredientId + ' > td.family').get(0).firstChild.nodeValue = ingredientObj.famille;
+        $('tr#' + ingredientId + ' > td.glucides').get(0).firstChild.nodeValue = ingredientObj.glucides;
+        $('tr#' + ingredientId + ' > td.lipides').get(0).firstChild.nodeValue = ingredientObj.lipides;
+        $('tr#' + ingredientId + ' > td.proteines').get(0).firstChild.nodeValue = ingredientObj.proteines;
+    }
+
+    function updateCalcAll() {
+        var glucides = calcField('tbody > tr > td.glucides');
+        var proteines = calcField('tbody > tr > td.proteines');
+        var lipides = calcField('tbody > tr > td.lipides');
+        $('tfoot > tr > td.glucides').get(0).firstChild.nodeValue = glucides;
+        $('tfoot > tr > td.proteines').get(0).firstChild.nodeValue = proteines;
+        $('tfoot > tr > td.lipides').get(0).firstChild.nodeValue = lipides;
+    }
+
+    function calcField(fieldName) {
+        var res = 0.0
+        $(fieldName).each(function(index, value) {
+            var currentVal = parseFloat(value.firstChild.nodeValue);
+            if(currentVal> 0.0) {
+                res += currentVal;
+            }
+        });
+        return res;
+    }
+    </script>
+
+
+
+</head>
+<body>
+
+<div class="ui-widget">
+    <form>
+    <label for="tags">Ingrédient à ajouter: </label>
+    <input id="ingredientToAdd" />
+
+    </form>
+</div>
+
+
+<table class="list" id="listIngredients">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Nom</td>
+            <td width="300">Famille</td>
+            <td>Glucides</td>
+            <td>Lipides</td>
+            <td>Protéines</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="ingredient1">
+            <td class="id">id1</td>
+            <td class="ingredientName">Name</td>
+            <td class="family">family</td>
+            <td class="glucides">0</td>
+            <td class="lipides">0</td>
+            <td class="proteines">0</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr id="total">
+            <td class="id"></td>
+            <td class="ingredientName"></td>
+            <td class="family">Total : </td>
+            <td class="glucides"> </td>
+            <td class="lipides"> </td>
+            <td class="proteines"> </td>
+        </tr>
+    </tfoot>
+</table>
+
+<input type="button" onclick="addInputIngredient();"/>
+
+<script>
+    $('#ingredientToAdd').autocomplete({
+            source: "http://localhost:9000/ingredients/startwith.json",
+            minLength: 3
+        });
+    $('#ingredientToAdd').keyup(actionOnEnterKey);
+</script>
+</body>
+</html>

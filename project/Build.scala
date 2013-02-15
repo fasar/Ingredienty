@@ -10,12 +10,10 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     // Add your project dependencies here,
     jdbc,
-    anorm,
-    javaEbean,
-    "org.hibernate" % "hibernate-entitymanager" % "4.1.9.Final"
+    anorm
   )
 
-  val main = play.Project(
+  val aamain = play.Project(
     appName, appVersion, appDependencies, path = file("main")
   ).dependsOn(
     website, adminArea

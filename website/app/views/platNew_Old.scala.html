@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Créateur de plat</title>
+    <link rel="shortcut icon" type="image/png" href="public/images/favicon.png">
+    @includeScripts()
+    <script>
+    function addAutocomplete(id) {
+        $( "input#ingredientName" + id ).autocomplete({
+            source: "http://localhost:9000/ingredients/startwith.json",
+            minLength: 3
+        });
+    };
+
+    function newInputFiledIngredient(id) {
+        var res = '<tr id="ingredient'+id+'"> \
+            <td class="id">id'+id+'</td> \
+            <td class="ingredientNameTd"><input class="ingredientName" name="ingredientName'+id+'" id="ingredientName'+id+'"></td> \
+            <td class="family">family</td> \
+            <td class="glucides">glucides</td> \
+            <td class="lipides">lipides</td> \
+            <td class="proteines">protéines</td> \
+            </tr>';
+        var len = $('#listIngredients > tbody > tr').length;
+        $('#listIngredients > tbody > tr').eq(len-1).after(res);
+        addAutocomplete(id);
+    }
+
+    function isValued(id) {
+        var ingredientId = 'ingredient'+id;
+        var inputField = document.getElementById('ingredientName' + id);
+        return inputField.value.length > 0
+    }
+
+    var curId = 2;
+    function addInputIngredient() {
+        var validToAdd = true;
+        for(id=1; id<curId; id++) {
+           if(! isValued(id)) validToAdd = false;
+        }
+        if(validToAdd) {
+           newInputFiledIngredient(curId);
+           majInputFieldHandler(curId);
+           curId=curId+1;
+        };
+    }
+
+    function onKeyCodeDoAction(actionCode) { return function (action) { return function (event) {
+        if (event.keyCode == actionCode) {
+            action();
+        }
+    }}}
+    function actionOnEnterKey(currentId) { return function(event) {
+	    //onKeyCodeDoAction(13)(addInputIngredient)(event)
+        if (event.keyCode == 13) {
+            addInputIngredient();
+            if(isValued(currentId)) {
+                focusOnFirstEmptyInput();
+            }
+        }
+    }}
+
+    function majInputFieldHandler(id) {
+        $('input#ingredientName'+id).keyup( actionOnEnterKey(id) );
+    }
+
+    function focusOnFirstEmptyInput() {
+            var id = 1
+            while(id<=curId && isValued(id)) {
+                id = id + 1;
+            }
+            if(id<=curId) {
+                var inputField = document.getElementById('ingredientName' + id);
+                inputField.focus();
+            }
+    }
+
+    function majInfo(id) {
+        var ingredientName = $('tr#ingredient'+id+' > td.ingredientNameTd :first-child').get(0).value
+        $('tr#ingredient1 > td.id').get(0).firstChild.nodeValue = "ppppklfoinzefoizenoiefzn"
+        $('tr#ingredientName'+id +' > td.id')
+    }
+
+    var resJson = "";
+    function get() {
+      $.ajax({ url: "http://localhost:9000/ingredient/2000/apports.json",
+        dataType:"json",
+        success: function(data) {
+            alert(JSON.stringify(data));
+            resJson = data;
+        },
+        error: function( jqXHR, textStatus, errorThrown ) {
+            alert(textStatus);
+            alert(JSON.stringify(jqXHR));
+            alert(errorThrown);
+        }
+      });
+    }
+    </script>
+
+</head>
+<body>
+
+<div class="ui-widget">
+    <form>
+    <label for="tags">Tags: </label>
+    <input id="tags" />
+
+    </form>
+</div>
+
+
+<table class="list" id="listIngredients">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Family</td>
+            <td>Glucides</td>
+            <td>Lipides</td>
+            <td>Protéines</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="ingredient1">
+            <td class="id">id1</td>
+            <td class="ingredientNameTd"><input class="ingredientName" name="ingredientName1" id="ingredientName1"></td>
+            <td class="family">family</td>
+            <td class="glucides">glucides</td>
+            <td class="lipides">lipides</td>
+            <td class="proteines">protéines</td>
+        </tr>
+    </tbody>
+</table>
+
+<input type="button" onclick="addInputIngredient();"/>
+
+<script>
+    majInputFieldHandler(1);
+    addAutocomplete(1);
+</script>
+
+</body>
+</html>
