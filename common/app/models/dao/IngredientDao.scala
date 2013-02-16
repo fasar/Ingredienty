@@ -6,6 +6,8 @@ import anorm._
 import play.api.db.DB
 import anorm.~
 import models.Ingredient
+import play.api.cache.Cache
+import play.api.Logger
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,6 +17,8 @@ import models.Ingredient
  * To change this template use File | Settings | File Templates.
  */
 object IngredientDao {
+  private val log = Logger(IngredientDao.getClass)
+
   /**
    * Parse an Ingredient from a ResultSet
    */
@@ -30,9 +34,22 @@ object IngredientDao {
   /**
    * Retrieve all Ingredient from the id.
    */
-  def findAll:List[Ingredient] = {
+  def findAllReq:List[Ingredient] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from ingredient").as(simple *)
+      val res = SQL("select * from ingredient").as(simple *)
+      log.debug("get all ingredients : " + res.size)
+      res
+    }
+  }
+
+  /**
+   * Retrieve all Ingredient from the id.
+   */
+  def findAll:List[Ingredient] = {
+    val timeout = 7200
+    Cache.getOrElse[List[Ingredient]]("ingredientDao.ingredients", timeout) {
+      log.info("setup a cache for all ingredients for " + timeout + " seconds")
+      this.findAllReq
     }
   }
 

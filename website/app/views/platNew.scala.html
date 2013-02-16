@@ -25,8 +25,9 @@
             <td class="lipides">lipides</td> \
             <td class="proteines">protéines</td> \
             </tr>';
-        var len = $('#listIngredients > tbody > tr').length;
-        $('#listIngredients > tbody > tr').eq(len-1).after(res);  
+        //var len = $('#listIngredients > tbody > tr').length;
+        //$('#listIngredients > tbody > tr').eq(len-1).after(res);
+        $('#listIngredients > tbody').append(res);
     }
 
    
@@ -70,7 +71,7 @@
                 res += currentVal;
             }
         });
-        return res;
+        return res.toFixed(2);
     }
     </script>
 
@@ -78,7 +79,6 @@
 
 </head>
 <body>
-
 <div class="ui-widget">
     <form>
     <label for="tags">Ingrédient à ajouter: </label>
@@ -88,7 +88,15 @@
 </div>
 
 
-<table class="list" id="listIngredients">
+<div class="ui-widget">
+<form>
+<label for="tags">Nom du plat: </label>
+<input id="recipeName" />
+
+</form>
+</div>
+
+<table class="list" id="listIngredients" border="1">
     <thead>
         <tr>
             <td>Id</td>
@@ -100,14 +108,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr id="ingredient1">
-            <td class="id">id1</td>
-            <td class="ingredientName">Name</td>
-            <td class="family">family</td>
-            <td class="glucides">0</td>
-            <td class="lipides">0</td>
-            <td class="proteines">0</td>
-        </tr>
+
     </tbody>
     <tfoot>
         <tr id="total">
@@ -121,11 +122,9 @@
     </tfoot>
 </table>
 
-<input type="button" onclick="addInputIngredient();"/>
-
 <script>
     $('#ingredientToAdd').autocomplete({
-            source: "http://localhost:9000/ingredients/startwith.json",
+            source:  "http://localhost:9000/ingredients/startwith.json",
             minLength: 3
         });
     $('#ingredientToAdd').keyup(actionOnEnterKey);
