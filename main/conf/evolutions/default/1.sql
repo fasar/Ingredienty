@@ -1,4 +1,4 @@
-# --- First database schema
+# --- Database schema of the domain model
 
 # --- !Ups
 

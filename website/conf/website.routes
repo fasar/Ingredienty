@@ -2,23 +2,21 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.website.Application.index
-GET     /hello/                     controllers.website.Application.hello(name = "no name def")
-GET     /hello/:name                controllers.website.Application.hello(name:String)
-GET     /stream                     controllers.website.Application.stream
-GET     /comet                      controllers.website.Application.comet
-GET     /comet2                     controllers.website.Application.comet2
-GET     /cometEx                    controllers.website.Application.cometEx
-GET     /uploadForm                 controllers.website.Application.uploadForm
-POST    /upload                     controllers.website.Application.upload
+# Authentication
+GET     /login                              controllers.website.UserManagement.login
+POST    /login                              controllers.website.UserManagement.authenticate
+GET     /logout                             controllers.website.UserManagement.logout
 
-GET     /ingredients                controllers.website.Application.ingredients
-GET     /ingredients/startwith.json      controllers.website.Application.ingredientsQuery
-GET     /ingredient/:id/apports.json     controllers.website.Application.ingredientApports(id:Long)
-GET     /ingredient/cherche         controllers.website.Application.ingredientCherche
-GET     /plat/nouveau               controllers.website.Application.newPlat
-GET     /recette                    controllers.website.Application.recette
+# Home page
+GET     /                                   controllers.website.Application.index
+
+# Ingredients pages
+GET     /ingredients                        controllers.website.Application.ingredients
+GET     /ingredients/startwith.json         controllers.website.Application.ingredientsQuery
+GET     /ingredient/:id/apports.json        controllers.website.Application.ingredientApports(id:Long)
+GET     /ingredient/cherche                 controllers.website.Application.ingredientCherche
+GET     /plat/nouveau                       controllers.website.Application.newPlat
+GET     /recette                            controllers.website.Application.recette
 
 
 
