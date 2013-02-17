@@ -2,12 +2,20 @@
 <html>
 <head>
     <title>Créateur de plat</title>
-    <link rel="shortcut icon" type="image/png" href="http://localhost:9000/public/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="@controllers.website.routes.Assets.at("/images/favicon.png")">
     @includeScripts()
 
     <script>
-        
-    var curId = 2;
+    $(function() {
+        $('#ingredientToAdd').autocomplete({
+            source:  "http://localhost:9000/ingredients/startwith.json",
+            minLength: 3
+        });
+    });
+
+    $(function() {$('#ingredientToAdd').keyup(actionOnEnterKey); });
+
+    var curId = 1;
     function actionOnEnterKey(event) {
         if (event.keyCode == 13) {
             var ingredientKey = $('#ingredientToAdd').get(0).value
@@ -15,36 +23,60 @@
             curId=curId+1;
         }
     }
-        
-    function newInputFiledIngredient(id) {
-        var res = '<tr id="ingredient'+id+'"> \
-            <td class="id">id'+id+'</td> \
-            <td class="ingredientName">nom</td> \
-            <td class="family">famille</td> \
-            <td class="glucides">glucides</td> \
-            <td class="lipides">lipides</td> \
-            <td class="proteines">protéines</td> \
-            </tr>';
-        //var len = $('#listIngredients > tbody > tr').length;
-        //$('#listIngredients > tbody > tr').eq(len-1).after(res);
-        $('#listIngredients > tbody').append(res);
-    }
 
-   
-    
     function majIngredientLine(ingredientKey, lineId) {
         var url = "/ingredient/"+ingredientKey+"/apports.json";
         $.ajax({ url: url,
             dataType:"json",
             success: function(data) {
                 newInputFiledIngredient(lineId);
-                updateIngredientLine(data, lineId);
-                updateCalcAll();
+                updateCalcIngredientLine(data, lineId);
+                updateCalcTotal();
             }
         });
     }
-    
-    function updateIngredientLine(ingredientObj, lineId) {
+    function newInputFiledIngredient(id) {
+        var res = '<tr id="ingredient'+id+'"> \
+            <td class="id">id'+id+'</td> \
+            <td class="quantity"><input type="text" class="quantity" size="5" value="100"/> gr</td> \
+            <td class="ingredientName">nom</td> \
+            <td class="family">famille</td> \
+            <td class="glucides">glucides</td> \
+            <td class="lipides">lipides</td> \
+            <td class="proteines">protéines</td> \
+            <td class="glucidesTt">glucides</td> \
+            <td class="lipidesTt">lipides</td> \
+            <td class="proteinesTt">protéines</td> \
+            </tr>';
+
+        $('#listIngredients > tbody').append(res);
+        addOnChangeInputField(id);
+    }
+
+    function addOnChangeInputField(id) {
+        var ingredientId = 'ingredient'+id;
+        $('tbody > tr#'+ingredientId+' > td > input').keyup(function() {
+            updateCalcIngredientLineNutriments(id);
+            updateCalcTotal();
+        });
+    }
+
+    function updateCalcIngredientLineNutriments(id) {
+        var ingredientId = 'ingredient'+id;
+        var glucidesStr = $('tbody > tr#'+ingredientId+' > td.glucides').get(0).firstChild.nodeValue;
+        var glucides = parseFloat(glucidesStr);
+        var proteinesStr = $('tbody > tr#'+ingredientId+' > td.proteines').get(0).firstChild.nodeValue;
+        var proteines = parseFloat(proteinesStr);
+        var lipidesStr = $('tbody > tr#'+ingredientId+' > td.lipides').get(0).firstChild.nodeValue;
+        var lipides = parseFloat(lipidesStr);
+        var quantityStr = $('tbody > tr#'+ingredientId+' > td > input').get(0).value;
+        var quantity =  parseFloat(quantityStr);
+        $('tr#' + ingredientId + ' > td.glucidesTt').get(0).firstChild.nodeValue = (glucides * quantity) / 100;
+        $('tr#' + ingredientId + ' > td.lipidesTt').get(0).firstChild.nodeValue = (lipides * quantity) / 100;
+        $('tr#' + ingredientId + ' > td.proteinesTt').get(0).firstChild.nodeValue = (proteines * quantity) / 100;
+    }
+
+    function updateCalcIngredientLine(ingredientObj, lineId) {
         var ingredientId = 'ingredient' + lineId;
         $('tr#' + ingredientId + ' > td.id').get(0).firstChild.nodeValue = ingredientObj.id;
         $('tr#' + ingredientId + ' > td.ingredientName').get(0).firstChild.nodeValue = ingredientObj.name;
@@ -54,18 +86,24 @@
         $('tr#' + ingredientId + ' > td.proteines').get(0).firstChild.nodeValue = ingredientObj.proteines;
     }
 
-    function updateCalcAll() {
-        var glucides = calcField('tbody > tr > td.glucides');
-        var proteines = calcField('tbody > tr > td.proteines');
-        var lipides = calcField('tbody > tr > td.lipides');
+    function updateCalcTotal() {
+        var glucides = calcColumn('tbody > tr > td.glucides');
+        var proteines = calcColumn('tbody > tr > td.proteines');
+        var lipides = calcColumn('tbody > tr > td.lipides');
+        var glucidesTt = calcColumn('tbody > tr > td.glucidesTt');
+        var proteinesTt = calcColumn('tbody > tr > td.proteinesTt');
+        var lipidesTt = calcColumn('tbody > tr > td.lipidesTt');
         $('tfoot > tr > td.glucides').get(0).firstChild.nodeValue = glucides;
         $('tfoot > tr > td.proteines').get(0).firstChild.nodeValue = proteines;
         $('tfoot > tr > td.lipides').get(0).firstChild.nodeValue = lipides;
+        $('tfoot > tr > td.glucidesTt').get(0).firstChild.nodeValue = glucidesTt;
+        $('tfoot > tr > td.proteinesTt').get(0).firstChild.nodeValue = proteinesTt;
+        $('tfoot > tr > td.lipidesTt').get(0).firstChild.nodeValue = lipidesTt;
     }
 
-    function calcField(fieldName) {
+    function calcColumn(columnName) {
         var res = 0.0
-        $(fieldName).each(function(index, value) {
+        $(columnName).each(function(index, value) {
             var currentVal = parseFloat(value.firstChild.nodeValue);
             if(currentVal> 0.0) {
                 res += currentVal;
@@ -73,6 +111,9 @@
         });
         return res.toFixed(2);
     }
+
+
+
     </script>
 
 
@@ -100,8 +141,12 @@
     <thead>
         <tr>
             <td>Id</td>
-            <td>Nom</td>
-            <td width="300">Famille</td>
+            <td>Quantité</td>
+            <td width="300">Nom</td>
+            <td>Famille</td>
+            <td>Glucides/100gr</td>
+            <td>Lipides/100gr</td>
+            <td>Protéines/100gr</td>
             <td>Glucides</td>
             <td>Lipides</td>
             <td>Protéines</td>
@@ -112,22 +157,19 @@
     </tbody>
     <tfoot>
         <tr id="total">
-            <td class="id"></td>
-            <td class="ingredientName"></td>
-            <td class="family">Total : </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total : </td>
             <td class="glucides"> </td>
             <td class="lipides"> </td>
             <td class="proteines"> </td>
+            <td class="glucidesTt"> </td>
+            <td class="lipidesTt"> </td>
+            <td class="proteinesTt"> </td>
         </tr>
     </tfoot>
 </table>
 
-<script>
-    $('#ingredientToAdd').autocomplete({
-            source:  "http://localhost:9000/ingredients/startwith.json",
-            minLength: 3
-        });
-    $('#ingredientToAdd').keyup(actionOnEnterKey);
-</script>
 </body>
 </html>
