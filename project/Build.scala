@@ -6,11 +6,14 @@ object ApplicationBuild extends Build {
 
   val appName         = "Ingredienty"
   val appVersion      = "1.0-SNAPSHOT"
-
+  
   val appDependencies = Seq(
     // Add your project dependencies here,
     jdbc,
     anorm
+    // Dependencies of mongoDb
+    //"se.radley" %% "play-plugins-salat" % "1.2"
+    //"org.reactivemongo" %% "reactivemongo" % "0.8"
   )
 
   val aamain = play.Project(
@@ -32,8 +35,7 @@ object ApplicationBuild extends Build {
     appName + "-admin", appVersion, appDependencies, path = file("admin")
   ).dependsOn(common)
 
-
-
+  
 
 //  val dbLoader = Project("dbLoader", file("dbLoader")).settings(scalaVersion := "2.10.0")
 }

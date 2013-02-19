@@ -5,7 +5,6 @@ import libs.Comet
 import libs.iteratee.Enumerator
 import libs.json.{JsString, Json}
 import play.api.mvc._
-import concurrent.ExecutionContext
 
 import models._
 import models.dao.{UnitDao, IngredientDao}
@@ -14,14 +13,11 @@ import anorm._
 
 object Application extends Controller {
   private val log = Logger(classOf[Application])
-
+		  
   def index = Action {
     req =>
-      implicit val myCustomCharset = Codec.javaSupported("iso-8859-1")
       Ok(views.html.index("Ok, got a request : " + req))
   }
-
-  def recette = TODO
 
   def newPlat = Action { Ok(views.html.platNew()) }
 

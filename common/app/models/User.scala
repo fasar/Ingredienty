@@ -1,27 +1,39 @@
-package models.website
+package models
 
 
 import play.api.db._
 import play.api.Play.current
-
 import anorm._
 import anorm.SqlParser._
 
+object Role extends Enumeration {
+	type Role = Value
+	val User = Value(100)
+	val Admin = Value(300)
+}
 
-case class User(email: String, name: String, password: String)
+
+case class User(email: String, name: String, password: String, role: Role.Role)
 
 object User {
-
+  private type ThisType = User
+  
+  
+  def apply(email: String, name: String, password: String, role: Int): User = {
+    apply(email, name, password, Role(role))
+  }
+  
   // -- Parsers
 
   /**
    * Parse a User from a ResultSet
    */
-  val simple = {
+  private val simple = {
     get[String]("user.email") ~
       get[String]("user.name") ~
-      get[String]("user.password") map {
-      case email~name~password => User(email, name, password)
+      get[String]("user.password") ~
+      get[Int]("user.role") map {
+      case email~name~password~role => User(email, name, password, role)
     }
   }
 
@@ -30,27 +42,27 @@ object User {
   /**
    * Retrieve a User from email.
    */
-  def findByEmail(email: String): Option[User] = {
+  def findByEmail(email: String): Option[ThisType] = {
     DB.withConnection { implicit connection =>
       SQL("select * from user where email = {email}").on(
         'email -> email
-      ).as(User.simple.singleOpt)
+      ).as(this.simple.singleOpt)
     }
   }
 
   /**
    * Retrieve all users.
    */
-  def findAll: Seq[User] = {
+  def findAll: Seq[ThisType] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from user").as(User.simple *)
+      SQL("select * from user").as(this.simple *)
     }
   }
 
   /**
    * Authenticate a User.
    */
-  def authenticate(email: String, password: String): Option[User] = {
+  def authenticate(email: String, password: String): Option[ThisType] = {
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -60,25 +72,26 @@ object User {
       ).on(
         'email -> email,
         'password -> password
-      ).as(User.simple.singleOpt)
+      ).as(this.simple.singleOpt)
     }
   }
 
   /**
    * Create a User.
    */
-  def create(user: User): User = {
+  def create(user: ThisType): ThisType = {
     DB.withConnection { implicit connection =>
       SQL(
         """
           insert into user values (
-            {email}, {name}, {password}
+            {email}, {name}, {password}, {role}
           )
         """
       ).on(
         'email -> user.email,
         'name -> user.name,
-        'password -> user.password
+        'password -> user.password,
+        'role -> user.role.id
       ).executeUpdate()
 
       user

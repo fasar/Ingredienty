@@ -18,3 +18,9 @@ project/plugins/project/
 
 # Kate and Gedit backup file
 *~
+
+#eclipse specific
+.cache
+.classpath
+.project
+.settings/

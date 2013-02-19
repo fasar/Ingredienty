@@ -1,0 +1,29 @@
+@(recettes: Seq[Recipe])
+
+@main("Recettes"){
+<table border="1">
+<thead>
+  <tr>
+    <td>Id</td>
+    <td>Nom</td><td>Description</td>
+    <td>Temps de préparation</td>
+    <td>Temps de cuisson</td>
+    <td>Auteur</td>
+  </tr>
+</thead>
+<tbody>
+ @for(recette <- recettes) {
+  <tr>
+    <td>@recette.id.get</td>
+    <td>@recette.name</td>
+    <td>@recette.description</td>
+    <td>@recette.prepTimeSec</td>
+    <td>@recette.cookTimeSec</td>
+    <td>@recette.author</td>
+  </tr>
+ }
+</tbody>
+</table>
+
+
+}

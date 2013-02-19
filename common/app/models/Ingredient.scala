@@ -7,6 +7,11 @@ import dao.{IngredientPropertyDao, IngredientIngredientPropertyMapDao, Ingredien
 import play.api.Logger
 
 
+import play.api.libs.json._
+// you need this import to have combinators
+import play.api.libs.functional.syntax._
+
+
 case class Ingredient(id: Pk[Long] = NotAssigned,
                       name:String,
                       family_id: Option[Long]) {
@@ -54,11 +59,6 @@ case class IngredientProperty(name: Pk[String],
                               unit_id:Long)
 
 
-case class Unit(id:Pk[Long]= NotAssigned,
-                name:String,
-                nameAbrv:Option[String],
-                plural:Option[String],
-                pluralAbrv:Option[String])
 
 
 case class IngredientIngredientPropertyMap(ingredientId: Pk[Long],
