@@ -1,13 +1,6 @@
 @(form: Form[(String,String)])(implicit flash: Flash)
 
-<html>
-<head>
-    <title>Ingredienty</title>
-    <link rel="shortcut icon" type="image/png" href="@controllers.website.routes.Assets.at("images/favicon.png")">
-    <link rel="stylesheet" type="text/css" media="screen" href="@controllers.website.routes.Assets.at("stylesheets/login.css")">
-</head>
-<body>
-
+@main("Ingredienty") {
 <header>
     <a href="@controllers.website.Application.index" id="logo"><span>Ingredienty</span></a>
 </header>
@@ -44,5 +37,4 @@
     Try <em>sample@@sample.com</em> with <em>secret</em> as password.
 </p>
 
-</body>
-</html>
+}

@@ -1,0 +1,38 @@
+@(precipe: Recipe)
+@import models.Recipe
+@import views.html._
+
+@main("Affichage de la recette") {
+
+<h2>@precipe.name</h2>
+
+<p>
+    <label>Id :</label> @precipe.id
+</p>
+
+<p>
+    <label>Description :</label> @precipe.description
+</p>
+
+<p>
+    <label>Temps de préparation :</label> @precipe.prepTimeSec
+</p>
+<p>
+    <label>Temps de cuisson :</label> @precipe.cookTimeSec
+</p>
+<p>
+    <label>Instructions :</label> @precipe.instructions
+</p>
+<p>
+    <label>Auteur :</label> @precipe.author
+</p>
+
+
+<ul>
+    @precipe.ingredients.map { ingredient =>
+      <li>@ingredient._1.id ; @ingredient._1.name ; @ingredient._2</li>
+    }
+</ul>
+
+
+}

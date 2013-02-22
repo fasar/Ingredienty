@@ -19,8 +19,6 @@ object Application extends Controller {
       Ok(views.html.index("Ok, got a request : " + req))
   }
 
-  def newPlat = Action { Ok(views.html.platNew()) }
-
   def ingredients = Action {
     val ingredients = IngredientDao.findAll
 

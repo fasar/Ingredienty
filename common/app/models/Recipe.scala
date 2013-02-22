@@ -18,21 +18,26 @@ case class Recipe(id: Pk[Long] = NotAssigned,
                   description: String,
                   prepTimeSec: Int,
                   cookTimeSec: Int,
-                  ingredients: Map[Ingredient, Double])
+                  ingredients: List[(Ingredient, Double)])
 
 object Recipe {
   private type ThisType = Recipe
 
-  def apply(name: String,
-            instructions: String,
-            authorStr: Option[String],
-            isPublic: Boolean,
-            description: String,
-            prepTimeSec: Int,
-            cookTimeSec: Int,
-            ingredients: Map[Ingredient, Double]): Recipe = {
+  def apply( id: Option[Long],
+             name: String,
+             instructions: String,
+             authorStr: Option[String],
+             isPublic: Boolean,
+             description: String,
+             prepTimeSec: Int,
+             cookTimeSec: Int,
+             ingredients: List[(Ingredient, Double)]): Recipe = {
     val author: Option[User] = authorStr.flatMap {x=> User.findByEmail(x) }
-    new Recipe(NotAssigned, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
+    id match {
+      case Some(id) => new Recipe(Id(id), name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
+      case None => new Recipe(NotAssigned, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
+
+    }
   }
 
   def apply(id: Pk[Long],
@@ -49,7 +54,7 @@ object Recipe {
     new Recipe(id, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredientsQuantities)
   }
 
-  private def getIngredientsQuantities(id: Pk[Long]): Map[Ingredient, Double] = {
+  private def getIngredientsQuantities(id: Pk[Long]): List[(Ingredient, Double)] = {
     val ingredientQuantities = IngredientRecipeQuantity.findByRecipeId(id.get)
     (for (
       ingredientQuantity <- ingredientQuantities;
@@ -58,7 +63,7 @@ object Recipe {
     ) yield {
       val quantity = ingredientQuantity.quantity
       ingredient -> quantity
-    }).toMap
+    })
   }
 
   // -- Parsers
@@ -83,7 +88,7 @@ object Recipe {
   // -- Queries
 
   /**
-   * Retrieve all users.
+   * Retrieve all Recipes.
    */
   def findAll: Seq[ThisType] = {
     DB.withConnection { implicit connection =>
@@ -91,6 +96,16 @@ object Recipe {
     }
   }
 
+  /**
+   * Retrieve a Recipe from an id.
+   */
+  def findById(id: Long): Option[ThisType] = {
+    DB.withConnection { implicit connection =>
+      SQL("select * from Recipe where id = {id}").on(
+        'id -> id).as(this.simple.singleOpt)
+    }
+  }
+  
   /**
    * Create a Recipe.
    */
@@ -100,7 +115,7 @@ object Recipe {
         """
           insert into recipe (name, instructions, author_email, is_public, description, prep_time_sec, cook_time_sec)
           values (
-            {name}, {instructions}, {authorEmail}, 
+            {name}, {instructions}, {authorEmail},
             {is_public}, {description}, {prepTimeSec}, {cookTimeSec}
           )
         """).on(
@@ -112,10 +127,10 @@ object Recipe {
           'prepTimeSec -> element.prepTimeSec,
           'cookTimeSec -> element.cookTimeSec).executeInsert()
       id.map{id =>
-          val recipe = Recipe(Id(id), element.name, 
+          val recipe = Recipe(Id(id), element.name,
               element.instructions, element.author,
               element.isPublic, element.description,
-              element.prepTimeSec, element.cookTimeSec, 
+              element.prepTimeSec, element.cookTimeSec,
               element.ingredients)
           createIngredientsQuantities(recipe)
           recipe
@@ -137,6 +152,15 @@ object Recipe {
           'quantity -> quantity).executeUpdate()
     }
   }
+
+
+  /**
+   * Update a Recipe.
+   */
+  def update(element: ThisType): Option[ThisType] = {
+    throw new Exception("Not implemented yet")
+  }
+
 
   /**
    * Delete a Recipe.
@@ -214,7 +238,7 @@ object IngredientRecipeQuantity {
   /**
    * Delete an IngredientRecipeQuantity.
    *
-   * @param ids of the IngredientRecipeQuantity to delete.
+   * @param recipeId of the IngredientRecipeQuantity to delete.
    */
   def delete(recipeId: Long, ingredientId: Long) = {
     DB.withConnection { implicit connection =>

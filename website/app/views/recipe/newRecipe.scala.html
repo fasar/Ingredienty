@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Créateur de plat</title>
-    <link rel="shortcut icon" type="image/png" href="@controllers.website.routes.Assets.at("/images/favicon.png")">
-    @includeScripts()
+<title>Créateur de plat</title>
+<link rel="shortcut icon" type="image/png"
+ href="@controllers.website.routes.Assets.at("/images/favicon.png")">
+@includeScripts()
 
-    <script>
+<script>
     $(function() {
         $('#ingredientToAdd').autocomplete({
             source:  "http://localhost:9000/ingredients/startwith.json",
@@ -14,7 +15,8 @@
     });
 
     $(function() {$('#ingredientToAdd').keyup(actionOnEnterKey); });
-
+    $(function() {$('#submit').click(createRecipe); });
+    
     var curId = 1;
     function actionOnEnterKey(event) {
         if (event.keyCode == 13) {
@@ -31,6 +33,7 @@
             success: function(data) {
                 newInputFiledIngredient(lineId);
                 updateCalcIngredientLine(data, lineId);
+                updateCalcIngredientLineNutriments(lineId);
                 updateCalcTotal();
             }
         });
@@ -111,65 +114,135 @@
         });
         return res.toFixed(2);
     }
+    
+    function createRecipe() {
+       var recipe = new Object;
+       var prepTimeSec = parseInt($('input#prepTime').get(0).value);
+       var cookTimeSec = parseInt($('input#cookTime').get(0).value);
+       var url = "http://localhost:9000/recette";
+       recipe.name = $('input#recipeName').get(0).value;
+       recipe.instructions = $('input#instructions').get(0).value;
+       recipe.author = $('input#author').get(0).value;
+       recipe.isPublicChkBx = $('input#public').get(0).value;
+       recipe.description = $('input#description').get(0).value;
+       if(prepTimeSec != NaN) {
+         recipe.prepTimeSec = prepTimeSec;
+       } else {
+	     recipe.prepTimeSec = 0;
+       }
+       if(cookTimeSec != NaN) {
+	     recipe.cookTimeSec = cookTimeSec;
+       } else {
+	     recipe.cookTimeSec = 0;
+       }
+       recipe.ingredientsIdQt = new Object;
+       for(i=1; i<curId; i++) {
+           var ingredientIdQt = getIngredientIdQt(i);
+           jQuery.extend(recipe.ingredientsIdQt, ingredientIdQt);
+       }
+       $.ajax({ 
+           url: url,
+           type: "POST",
+           dataType: "json",
+           contentType:"text/json",
+           data: JSON.stringify(recipe),
+           success: function(data) {
+               alert("nouvelle recette ajoutée");
+           }
+       });
+    }
 
-
-
+    function getIngredientIdQt(lineId) {
+	   var ingredientId = "ingredient" + lineId;
+       var ingredient = new Object;
+       var id = $('tr#' + ingredientId + ' > td.id').get(0).firstChild.nodeValue;
+       var quantityStr = $('tbody > tr#'+ingredientId+' > td > input').get(0).value;
+       var quantity =  parseFloat(quantityStr);
+       ingredient[id] = quantity;
+       return ingredient;
+    }
+    
+	    
     </script>
 
 
 
 </head>
 <body>
-<div class="ui-widget">
-    <form>
-    <label for="tags">Ingrédient à ajouter: </label>
-    <input id="ingredientToAdd" />
+ <div class="ui-widget">
+  <form>
+  <p>
+   <label for="tags">Ingrédient à ajouter: </label>
+   <input id="ingredientToAdd" />
+  </p>
+  </form>
+ </div>
 
-    </form>
-</div>
 
+ <div class="ui-widget">
+  <p>
+   <label>Nom du plat: </label><input id="recipeName" />
+  </p>
+  <p>
+   <label>Temps de préparation (secondes): </label><input id="prepTime" />
+  </p>
+  <p>
+   <label>Temps de cuisson (secondes): </label><input id="cookTime" />
+  </p>
 
-<div class="ui-widget">
-<form>
-<label for="tags">Nom du plat: </label>
-<input id="recipeName" />
+ </div>
 
-</form>
-</div>
+ <table class="list" id="listIngredients" border="1">
+  <thead>
+   <tr>
+    <td>Id</td>
+    <td>Quantité</td>
+    <td width="300">Nom</td>
+    <td>Famille</td>
+    <td>Glucides/100gr</td>
+    <td>Lipides/100gr</td>
+    <td>Protéines/100gr</td>
+    <td>Glucides</td>
+    <td>Lipides</td>
+    <td>Protéines</td>
+   </tr>
+  </thead>
+  <tbody>
 
-<table class="list" id="listIngredients" border="1">
-    <thead>
-        <tr>
-            <td>Id</td>
-            <td>Quantité</td>
-            <td width="300">Nom</td>
-            <td>Famille</td>
-            <td>Glucides/100gr</td>
-            <td>Lipides/100gr</td>
-            <td>Protéines/100gr</td>
-            <td>Glucides</td>
-            <td>Lipides</td>
-            <td>Protéines</td>
-        </tr>
-    </thead>
-    <tbody>
+  </tbody>
+  <tfoot>
+   <tr id="total">
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>Total :</td>
+    <td class="glucides">0.0</td>
+    <td class="lipides">0.0</td>
+    <td class="proteines">0.0</td>
+    <td class="glucidesTt">0.0</td>
+    <td class="lipidesTt">0.0</td>
+    <td class="proteinesTt">0.0</td>
+   </tr>
+  </tfoot>
+ </table>
 
-    </tbody>
-    <tfoot>
-        <tr id="total">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Total : </td>
-            <td class="glucides"> </td>
-            <td class="lipides"> </td>
-            <td class="proteines"> </td>
-            <td class="glucidesTt"> </td>
-            <td class="lipidesTt"> </td>
-            <td class="proteinesTt"> </td>
-        </tr>
-    </tfoot>
-</table>
+ <p>
+  <label>Public : </label><input type="checkbox" id="public" />
+ </p>
+ <p>
+  <label>Description : </label><input type="text" id="description" />
+ </p>
+ <p>
+  <label>Instructions: </label><input type="text" id="instructions" />
+ </p>
+ <p>
+  <label>Auteur: </label><input type="text" id="author"
+   value="sample@@sample.com" />
+ </p>
+
+ <p>
+  <button id="submit">Submit</button>
+ </p>
 
 </body>
 </html>

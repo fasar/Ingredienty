@@ -1,37 +1,30 @@
 @(ingredients:Seq[Ingredient])
 @import models.dao._
 @{val ingredientProperties = IngredientPropertyDao.findAll}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>List des ingrédients</title>
-    <link rel="shortcut icon" type="image/png" href="@controllers.website.routes.Assets.at("public/images/favicon.png")">
-    @includeScripts()
-</head>
-<body>
-    <table border=1>
-        <thead>
-        <tr>
-            <td>Id</td>
-            <td>Name</td>
-            <td>Family</td>
-            <td>Glucides</td>
-            <td>Lipides</td>
-            <td>Protéines</td>
-        </tr>
-        </thead>
-        <tbody>
-        @for(ingredient <- ingredients) {
-        <tr>
-            <td>@ingredient.id</td>
-            <td>@ingredient.name</td>
-            <td>@ingredient.familyStr</td>
-            <td>@ingredient.ingredientProperties("Glucides")</td>
-            <td>@ingredient.ingredientProperties("Lipides")</td>
-            <td>@ingredient.ingredientProperties("Protéines")</td>
-        </tr>
-        }
-        </tbody>
-    </table>
-</body>
-</html>
+
+@main("List des ingrédients"){
+ <table border=1>
+     <thead>
+     <tr>
+         <td>Id</td>
+         <td>Name</td>
+         <td>Family</td>
+         <td>Glucides</td>
+         <td>Lipides</td>
+         <td>Protéines</td>
+     </tr>
+     </thead>
+     <tbody>
+     @for(ingredient <- ingredients) {
+     <tr>
+         <td>@ingredient.id</td>
+         <td>@ingredient.name</td>
+         <td>@ingredient.familyStr</td>
+         <td>@ingredient.ingredientProperties("Glucides")</td>
+         <td>@ingredient.ingredientProperties("Lipides")</td>
+         <td>@ingredient.ingredientProperties("Protéines")</td>
+     </tr>
+     }
+     </tbody>
+ </table>
+ }
