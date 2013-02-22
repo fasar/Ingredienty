@@ -34,13 +34,16 @@
    <div class="hidden_field">
      @helper.inputText(myForm("id")) 
    </div>
-   @helper.inputText(myForm("name"), 'label -> "Nom") 
+   @helper.inputText(
+       myForm("name"), 
+       'label -> "Nom"
+   ) 
    @helper.inputText(myForm("prepTimeSec"), 'label -> "Temps de préparation")
    @helper.inputText(myForm("cookTimeSec"), 'label -> "Temps de cuisson")
    @helper.checkbox(myForm("isPublic"), 'label -> "Publique")
    @helper.inputText(myForm("description"), 'label -> "Description")
    @helper.inputText(myForm("instructions"), 'label -> "Instructions")
- @helper.inputText(myForm("author"), 'label -> "auteur")
+   @helper.inputText(myForm("author"), 'label -> "Auteur")
 </fieldset>
 
 <fieldset>
@@ -76,16 +79,19 @@
 }
 
 <script type="text/javascript" charset="utf-8">
-   $('.removeProfile').click (function(e) {
-  	$(this).parents('.profile').remove();
-  	renumber();
-   })
+   function updateRemoveBtn() {
+     $('.removeProfile').click (function(e) {
+    	$(this).parents('.profile').remove();
+    	renumber();
+     })
+   }
 
     $('.addProfile').click (function(e) {
       var template = $('.profile_template')
       template.before('<div class="twipsies well profile">'
-              + template.html() + '</div>')
-      renumber()
+              + template.html() + '</div>');
+      renumber();
+      updateRemoveBtn();
     })
 
     // -- renumber fields
@@ -106,10 +112,6 @@
       $('input', this).each( function() {
          $(this).attr( 'name',
             $(this).attr('name').replace(/informations\[.+?\]/g, 'informations[' + i + ']'))
-         })
-      $('.phone input', this).each(function(i) {
-         $(this).attr( 'name', 
-      	    $(this).attr('name').replace( /phones\[.+\]/g,'phones[' + i + ']'))
          })
       })
     }
