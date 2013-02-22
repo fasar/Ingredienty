@@ -23,16 +23,16 @@ case class Recipe(id: Pk[Long] = NotAssigned,
 object Recipe {
   private type ThisType = Recipe
 
-  def apply( id: Option[Long],
-             name: String,
-             instructions: String,
-             authorStr: Option[String],
-             isPublic: Boolean,
-             description: String,
-             prepTimeSec: Int,
-             cookTimeSec: Int,
-             ingredients: List[(Ingredient, Double)]): Recipe = {
-    val author: Option[User] = authorStr.flatMap {x=> User.findByEmail(x) }
+  def apply(id: Option[Long],
+            name: String,
+            instructions: String,
+            authorStr: Option[String],
+            isPublic: Boolean,
+            description: String,
+            prepTimeSec: Int,
+            cookTimeSec: Int,
+            ingredients: List[(Ingredient, Double)]): Recipe = {
+    val author: Option[User] = authorStr.flatMap { x => User.findByEmail(x) }
     id match {
       case Some(id) => new Recipe(Id(id), name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
       case None => new Recipe(NotAssigned, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
@@ -49,7 +49,7 @@ object Recipe {
             prepTimeSec: Int,
             cookTimeSec: Int //ingredients: Map[Ingredient, Double]
             ): Recipe = {
-    val author: Option[User] =  authorStr.flatMap {x=> User.findByEmail(x) }
+    val author: Option[User] = authorStr.flatMap { x => User.findByEmail(x) }
     val ingredientsQuantities = getIngredientsQuantities(id)
     new Recipe(id, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredientsQuantities)
   }
@@ -105,12 +105,12 @@ object Recipe {
         'id -> id).as(this.simple.singleOpt)
     }
   }
-  
+
   /**
    * Create a Recipe.
    */
   def create(element: ThisType): Option[ThisType] = {
-    DB.withConnection { implicit connection =>
+    DB.withTransaction { implicit connection =>
       val id: Option[Long] = SQL(
         """
           insert into recipe (name, instructions, author_email, is_public, description, prep_time_sec, cook_time_sec)
@@ -121,19 +121,19 @@ object Recipe {
         """).on(
           'name -> element.name,
           'instructions -> element.instructions,
-          'authorEmail -> Option.empty[String],
+          'authorEmail -> element.author.map{_.email},
           'is_public -> element.isPublic,
           'description -> element.description,
           'prepTimeSec -> element.prepTimeSec,
           'cookTimeSec -> element.cookTimeSec).executeInsert()
-      id.map{id =>
-          val recipe = Recipe(Id(id), element.name,
-              element.instructions, element.author,
-              element.isPublic, element.description,
-              element.prepTimeSec, element.cookTimeSec,
-              element.ingredients)
-          createIngredientsQuantities(recipe)
-          recipe
+      id.map { id =>
+        val recipe = Recipe(Id(id), element.name,
+          element.instructions, element.author,
+          element.isPublic, element.description,
+          element.prepTimeSec, element.cookTimeSec,
+          element.ingredients)
+        createIngredientsQuantities(recipe)
+        recipe
       }
     }
   }
@@ -153,15 +153,55 @@ object Recipe {
     }
   }
 
-
   /**
    * Update a Recipe.
    */
   def update(element: ThisType): Option[ThisType] = {
-    throw new Exception("Not implemented yet")
+    if (element.id.isDefined) {
+      DB.withTransaction { implicit connection =>
+        SQL(
+          """
+              update Recipe
+              set 
+                name={name}, instructions={instructions}, author_email={authorEmail},
+                is_public={is_public}, description={description}, 
+                prep_time_sec={prepTimeSec}, cook_time_sec={cookTimeSec}
+              where id = {recipeId}
+            """).on(
+            'recipeId -> element.id.get,
+            'name -> element.name,
+            'instructions -> element.instructions,
+            'authorEmail -> element.author.map{_.email},
+            'is_public -> element.isPublic,
+            'description -> element.description,
+            'prepTimeSec -> element.prepTimeSec,
+            'cookTimeSec -> element.cookTimeSec).executeUpdate()
+          deleteAllIngredients(element)
+          createIngredientsQuantities(element)
+          Some(element)
+        }
+      } else None
+
   }
-
-
+  /**
+   * Delete a all ingredients of a recipe
+   *
+   * @param element IngredientRecipeQuantity to delete.
+   */
+  private def deleteAllIngredients(recipe: Recipe)(implicit connection: java.sql.Connection) = {
+    val ingredientsQuantities = recipe.ingredients
+    for (recipeId <- recipe.id) {
+      SQL(
+        """
+          delete from IngredientsRecipeQuantity_Map
+	  where recipe_id = {recipeId}
+        """).on(
+          'recipeId -> recipeId
+        ).executeUpdate()
+    }
+  }
+  
+  
   /**
    * Delete a Recipe.
    *
@@ -183,6 +223,7 @@ object Recipe {
     if (element.id.isDefined) { delete(element.id.get); }
   }
 
+  
 }
 
 case class IngredientRecipeQuantity(
@@ -250,7 +291,7 @@ object IngredientRecipeQuantity {
   }
 
   /**
-   * Delete a User.
+   * Delete a IngredientRecipeQuantity.
    *
    * @param element IngredientRecipeQuantity to delete.
    */
@@ -262,5 +303,6 @@ object IngredientRecipeQuantity {
       delete(recepeId, ingredientId)
     }
   }
+  
 
 }

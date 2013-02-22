@@ -36,7 +36,7 @@ object RecipeCtrl extends Controller {
    * @param id
    * @return
    */
-  def showRecipe(id: Long) = Action {
+  def show(id: Long) = Action{
     val existingRecipe = Recipe.findById(id)
     existingRecipe match {
       case Some(r: Recipe) => Ok(views.html.recipe.summary(r))
@@ -57,7 +57,7 @@ object RecipeCtrl extends Controller {
       // We got a valid recipe, display the summary
       recipe => {
         recipe.id match {
-          case NotImplemented =>
+          case NotAssigned =>
             log.debug("Get a new recipe : " + recipe)
             val res = Recipe.create(recipe)
             res match {

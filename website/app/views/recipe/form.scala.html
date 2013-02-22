@@ -8,16 +8,16 @@
    <div class="twipsies well @className">
      <a class="removeProfile btn danger pull-right">Remove this profile</a>
      @helper.inputText(
-        field("ingredientId"), 'label -> "Ingrédient" 
+        field("ingredientId"), '_label -> "Ingrédient" 
         )
      @helper.inputText(
-        field("quantity"), 'label -> "Quantité" 
+        field("quantity"), '_label -> "Quantité" 
         ) 
    </div>
 }
 
 
-@main("Créateur de recette") {
+@main("Création de recette") {
 
 @if(myForm.hasErrors) {
 <div class="alert-message error">
@@ -30,20 +30,20 @@
 @helper.form(action = controllers.website.routes.RecipeCtrl.submit, 'id -> "recipeForm") {
 
 <fieldset>
- <legend>General informations</legend>
+ <legend>Informations génerale</legend> 
    <div class="hidden_field">
      @helper.inputText(myForm("id")) 
    </div>
    @helper.inputText(
        myForm("name"), 
-       'label -> "Nom"
+       '_label -> "Nom"
    ) 
-   @helper.inputText(myForm("prepTimeSec"), 'label -> "Temps de préparation")
-   @helper.inputText(myForm("cookTimeSec"), 'label -> "Temps de cuisson")
-   @helper.checkbox(myForm("isPublic"), 'label -> "Publique")
-   @helper.inputText(myForm("description"), 'label -> "Description")
-   @helper.inputText(myForm("instructions"), 'label -> "Instructions")
-   @helper.inputText(myForm("author"), 'label -> "Auteur")
+   @inputText(myForm("prepTimeSec"), '_label -> "Temps de préparation")
+   @inputText(myForm("cookTimeSec"), '_label -> "Temps de cuisson")
+   @helper.checkbox(myForm("isPublic"), '_label -> "Publique")
+   @helper.inputText(myForm("description"), '_label -> "Description")
+   @helper.inputText(myForm("instructions"), '_label -> "Instructions")
+   @helper.inputText(myForm("author"), '_label -> "Auteur")
 </fieldset>
 
 <fieldset>
@@ -94,19 +94,25 @@
       updateRemoveBtn();
     })
 
+    $(function() {
+        $('#ingredientToAdd').autocomplete({
+            source:  "http://localhost:9000/ingredients/startwith.json",
+            minLength: 3
+        });
+    });
+    
     // -- renumber fields
 
     // Rename fields to have a coherent payload like:
     //
-    // informations[0].label
-    // informations[0].email
-    // informations[0].phones[0]
-    // informations[0].phones[1]
+    // ingredients[0].ingredientId
+    // ingredients[0].quantity
+    // ingredients[1].ingredientId
+    // ingredients[1].quantity
     // ...
     //
     // This is probably not the easiest way to do it. A jQuery plugin would help.
-
- 
+    
     var renumber = function(phones) {
 	$('.profile').each( function(i) {
       $('input', this).each( function() {
@@ -114,6 +120,10 @@
             $(this).attr('name').replace(/informations\[.+?\]/g, 'informations[' + i + ']'))
          })
       })
+    }
+    
+    var addAutoCompletion = function(phones) {
+      @* TODO *@
     }
 </script>
 }

@@ -22,7 +22,8 @@ GET     /ingredient/cherche                 controllers.website.Application.ingr
 GET     /recettes                           controllers.website.RecipeCtrl.recipes
 GET     /recette                            controllers.website.RecipeCtrl.form
 POST    /recette                            controllers.website.RecipeCtrl.submit
-GET     /recette/:id                        controllers.website.RecipeCtrl.editForm(id:Long)
+GET     /recette/:id                        controllers.website.RecipeCtrl.show(id:Long)
+GET     /recette/:id/edit                   controllers.website.RecipeCtrl.editForm(id:Long)
 
 ## Map static resources from the /public folder to the /assets URL path
 GET     /myassets/*file                     controllers.website.Assets.at(path="/public", file)

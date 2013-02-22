@@ -2,6 +2,8 @@
 @import models.Recipe
 @import views.html._
 
+
+
 @main("Affichage de la recette") {
 
 <h2>@precipe.name</h2>
@@ -24,7 +26,14 @@
     <label>Instructions :</label> @precipe.instructions
 </p>
 <p>
-    <label>Auteur :</label> @precipe.author
+    <label>Auteur :</label> @{
+    val author = if(precipe.author.isDefined) {
+        precipe.author.get.email
+      } else {
+         ""
+      };
+      author;  
+    }
 </p>
 
 

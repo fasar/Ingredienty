@@ -52,7 +52,7 @@ object RecipeHelper {
         yield {
           ingredient.id.get -> BigDecimal(quantity)
         }).toList
-      val author:String = recipe.author match { case Some(author) => author.email; case None => ""}
+      val author:String = recipe.author match { case Some(user) => user.email; case None => ""}
       val id: Option[Long] = recipe.id.toOption
       Some(id, recipe.name, recipe.instructions, author,
         recipe.isPublic, recipe.description, recipe.prepTimeSec,
