@@ -9,18 +9,14 @@ import models.Ingredient
 import play.api.cache.Cache
 import play.api.Logger
 
-/**
- * Created with IntelliJ IDEA.
- * User: fabien
- * Date: 14/02/13
- * Time: 12:38
- * To change this template use File | Settings | File Templates.
- */
+
 object IngredientDao {
   private val log = Logger(IngredientDao.getClass)
 
   /**
    * Parse an Ingredient from a ResultSet
+   * 
+   * It is useful for anorm parsing
    */
   private val simple = {
     get[Pk[Long]]("ingredient.id") ~
@@ -60,7 +56,7 @@ object IngredientDao {
     DB.withConnection { implicit connection =>
       SQL("select * from Ingredient where id = {id}")
         .on('id -> id)
-        .as(IngredientDao.simple.singleOpt)
+        .as(simple.singleOpt)
     }
   }
 
@@ -71,7 +67,7 @@ object IngredientDao {
     DB.withConnection { implicit connection =>
       SQL("select * from Ingredient where name = {name}")
         .on('name -> name)
-        .as(IngredientDao.simple.singleOpt)
+        .as(simple.singleOpt)
     }
   }
 

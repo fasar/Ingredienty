@@ -48,7 +48,7 @@ object IngredientPropertyDao {
   }
 
   /**
-   * Update a computer.
+   * Update an IngredientProperty.
    * Param id, Object
    */
   def update(id:Long, elem: IngredientProperty) = {
@@ -68,7 +68,7 @@ object IngredientPropertyDao {
 
 
   /**
-   * Insert a new computer.
+   * Insert a new IngredientProperty.
    *
    * param : the object
    */
@@ -88,7 +88,7 @@ object IngredientPropertyDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an IngredientProperty.
    *
    * @param name Id of the IngredientProperty to delete.
    */
@@ -100,7 +100,7 @@ object IngredientPropertyDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an IngredientProperty.
    *
    * @param elem IngredientProperty to delete.
    */

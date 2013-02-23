@@ -7,12 +7,7 @@
 @includeScripts()
 
 <script>
-    $(function() {
-        $('#ingredientToAdd').autocomplete({
-            source:  "http://localhost:9000/ingredients/startwith.json",
-            minLength: 3
-        });
-    });
+
 
     $(function() {$('#ingredientToAdd').keyup(actionOnEnterKey); });
     $(function() {$('#submit').click(createRecipe); });

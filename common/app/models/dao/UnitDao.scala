@@ -9,7 +9,7 @@ import models.Unit
 
 object UnitDao {
   /**
-   * Parse an Ingredient from a ResultSet
+   * Parse an Unit from a ResultSet
    */
   private val simple = {
     get[Pk[Long]]("id") ~
@@ -43,7 +43,7 @@ object UnitDao {
   }
 
   /**
-   * Update a computer.
+   * Update a Unit.
    * Param id, Object
    */
   def update(id:Long, elem: Unit) = {
@@ -66,7 +66,7 @@ object UnitDao {
 
 
   /**
-   * Insert a new computer.
+   * Insert a new unit.
    *
    * param : the object
    */
@@ -89,7 +89,7 @@ object UnitDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an unit.
    *
    * @param id Id of the unit to delete.
    */
@@ -101,7 +101,7 @@ object UnitDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an unit.
    *
    * @param elem unit to delete.
    */

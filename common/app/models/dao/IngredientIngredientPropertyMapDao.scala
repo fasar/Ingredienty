@@ -72,7 +72,7 @@ object IngredientIngredientPropertyMapDao {
 
 
   /**
-   * Insert a new computer.
+   * Insert a new IngredientIngredientPropertyMap.
    *
    * param : the object
    */
@@ -95,7 +95,7 @@ object IngredientIngredientPropertyMapDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an IngredientIngredientPropertyMap.
    *
    * @param ingredientId Id of the ingredientId
    * @param ingredientPropertyId  Id of the ingredientPropertyId
@@ -114,7 +114,7 @@ object IngredientIngredientPropertyMapDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an IngredientIngredientPropertyMap.
    *
    * @param elem IngredientIngredientPropertyMap to delete.
    */

@@ -47,7 +47,7 @@ object IngredientFamilyDao {
   }
 
   /**
-   * Update a computer.
+   * Update an IngredientFamily.
    * Param id, Object
    */
   def update(id:Long, elem: IngredientFamily) = {
@@ -67,7 +67,7 @@ object IngredientFamilyDao {
 
 
   /**
-   * Insert a new computer.
+   * Insert a new IngredientFamily.
    *
    * param : the object
    */
@@ -87,7 +87,7 @@ object IngredientFamilyDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an IngredientFamily.
    *
    * @param id Id of the IngredientFamily to delete.
    */
@@ -99,7 +99,7 @@ object IngredientFamilyDao {
   }
 
   /**
-   * Delete an object.
+   * Delete an IngredientFamily.
    *
    * @param elem IngredientFamily to delete.
    */
