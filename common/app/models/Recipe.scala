@@ -8,7 +8,7 @@ import play.api.Play.current
 import play.api.Logger
 import java.util.Date
 
-import models.dao.{ IngredientDao }
+import models.dao.{ IngredientDao, UserDao }
 
 case class Recipe(id: Pk[Long] = NotAssigned,
                   name: String,
@@ -32,7 +32,7 @@ object Recipe {
             prepTimeSec: Int,
             cookTimeSec: Int,
             ingredients: List[(Ingredient, Double)]): Recipe = {
-    val author: Option[User] = authorStr.flatMap { x => User.findByEmail(x) }
+    val author: Option[User] = authorStr.flatMap { x => UserDao.findByEmail(x) }
     id match {
       case Some(id) => new Recipe(Id(id), name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
       case None => new Recipe(NotAssigned, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredients)
@@ -49,7 +49,7 @@ object Recipe {
             prepTimeSec: Int,
             cookTimeSec: Int //ingredients: Map[Ingredient, Double]
             ): Recipe = {
-    val author: Option[User] = authorStr.flatMap { x => User.findByEmail(x) }
+    val author: Option[User] = authorStr.flatMap { x => UserDao.findByEmail(x) }
     val ingredientsQuantities = getIngredientsQuantities(id)
     new Recipe(id, name, instructions, author, isPublic, description, prepTimeSec, cookTimeSec, ingredientsQuantities)
   }

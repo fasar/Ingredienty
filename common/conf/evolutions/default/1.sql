@@ -12,7 +12,7 @@ create table Unit (
 ;
 
 create sequence Unit_seq;
-
+ALTER SEQUENCE Unit_seq RESTART WITH 1000;
 
 
 

@@ -23,7 +23,7 @@ create table IngredientsRecipeQuantity_Map (
 create sequence Recipes_seq;
 
 ALTER TABLE Recipe
-  ADD FOREIGN KEY (author_email) REFERENCES USER(email);
+  ADD FOREIGN KEY (author_email) REFERENCES USER(email) ON DELETE SET null;
 ALTER TABLE IngredientsRecipeQuantity_Map
   ADD FOREIGN KEY(recipe_id) REFERENCES Recipe(id) ON DELETE CASCADE;
 ALTER TABLE IngredientsRecipeQuantity_Map

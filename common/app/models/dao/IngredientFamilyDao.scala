@@ -4,7 +4,6 @@ import play.api.Play.current
 import anorm.SqlParser._
 import anorm._
 import play.api.db.DB
-import anorm.~
 import models.IngredientFamily
 
 /**

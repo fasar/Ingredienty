@@ -46,9 +46,9 @@ object UnitDao {
    * Update a Unit.
    * Param id, Object
    */
-  def update(id:Long, elem: Unit) = {
+  def update(id:Long, elem: Unit): Boolean = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val nbRow = SQL(
         """
           update unit
           set name = {name}, name_abrv = {name_abrv}, plural = {plural}, plural_abrv = {plural_abrv}
@@ -61,6 +61,7 @@ object UnitDao {
         'plural -> elem.plural,
         'plural_abrv -> elem.pluralAbrv
       ).executeUpdate()
+      nbRow >= 1
     }
   }
 
@@ -70,21 +71,25 @@ object UnitDao {
    *
    * param : the object
    */
-  def insert(elem: Unit) = {
+  def insert(elem: Unit): Option[Unit] = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val id = SQL(
         """
-          insert into unit values (
-            (select next value for computer_seq),
-            {name}, {name_abrv}, {plural}, {plural_abrv}
+          insert into unit 
+          (id, name, name_abrv, plural, plural_abrv, cunit_type)
+          values (
+            (select next value for Unit_seq),
+            {name}, {name_abrv}, {plural}, {plural_abrv}, {cunit_type}
           )
         """
       ).on(
         'name -> elem.name,
         'name_abrv -> elem.nameAbrv,
         'plural -> elem.plural,
-        'plural_abrv -> elem.pluralAbrv
-      ).executeUpdate()
+        'plural_abrv -> elem.pluralAbrv,
+        'cunit_type -> 999
+      ).executeInsert()
+      id map {x => Unit(Id(x), elem.name, elem.nameAbrv, elem.plural, elem.pluralAbrv)}
     }
   }
 
@@ -93,10 +98,11 @@ object UnitDao {
    *
    * @param id Id of the unit to delete.
    */
-  def delete(id: Long) = {
+  def delete(id: Long): Boolean = {
     DB.withConnection { implicit connection =>
-      SQL("delete from unit where id = {id}")
+      val nbRow = SQL("delete from unit where id = {id}")
         .on('id -> id).executeUpdate()
+      nbRow >= 1
     }
   }
 
@@ -105,8 +111,9 @@ object UnitDao {
    *
    * @param elem unit to delete.
    */
-  def delete(elem: Unit) {
+  def delete(elem: Unit): Boolean = {
     if (elem.id.isDefined)
       delete(elem.id.get)
+    else false
   }
 }

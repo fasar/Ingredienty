@@ -19,10 +19,11 @@ object IngredientPropertyDao {
    * Parse an IngredientProperty from a ResultSet
    */
   private val simple = {
-    get[Pk[String]]("name") ~
+    get[Pk[Long]]("id") ~
+      get[String]("name") ~
       get[Option[String]]("description")~
       get[Long]("unit_id") map {
-      case id~description~unitId => IngredientProperty(id, description, unitId)
+      case id~name~description~unitId => IngredientProperty(id, name, description, unitId)
     }
   }
 
@@ -39,7 +40,7 @@ object IngredientPropertyDao {
   /**
    * Retrieve an IngredientProperty from the id.
    */
-  def findById(id: Long): Option[IngredientProperty] = {
+  def findById(id:Long): Option[IngredientProperty] = {
     DB.withConnection { implicit connection =>
       SQL("select * from IngredientProperty where id = {id}")
         .on('id -> id)
@@ -51,18 +52,21 @@ object IngredientPropertyDao {
    * Update an IngredientProperty.
    * Param id, Object
    */
-  def update(id:Long, elem: IngredientProperty) = {
+  def update(id:Long, elem: IngredientProperty):Boolean = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val nbRow = SQL(
         """
           update IngredientProperty
-          set name = {name}
+          set name = {name}, description = {description}, unit_id = {unit_id}
           where id = {id}
         """
       ).on(
         'id -> id,
-        'name -> elem.name
+        'name -> elem.name,
+        'description -> elem.description,
+        'unit_id -> elem.unit_id
       ).executeUpdate()
+      nbRow >= 1
     }
   }
 
@@ -72,18 +76,23 @@ object IngredientPropertyDao {
    *
    * param : the object
    */
-  def insert(elem: IngredientProperty) = {
+  def insert(elem: IngredientProperty): Option[IngredientProperty] = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val id = SQL(
         """
-          insert into IngredientProperty values (
+          insert into IngredientProperty 
+          ( id, name, description, unit_id)
+          values (
             (select next value for IngredientProperty_seq),
-            {name}
+            {name}, {description}, {unit_id}
           )
         """
       ).on(
-        'name -> elem.name
-      ).executeUpdate()
+          'name -> elem.name,
+          'description -> elem.description,
+          'unit_id -> elem.unit_id
+      ).executeInsert()
+      id map {x=> IngredientProperty(Id(x), elem.name, elem.description, elem.unit_id)}
     }
   }
 
@@ -92,11 +101,12 @@ object IngredientPropertyDao {
    *
    * @param name Id of the IngredientProperty to delete.
    */
-  def delete(name: String) = {
-    DB.withConnection { implicit connection =>
-      SQL("delete from IngredientProperty where name = {name}")
-        .on('name -> name).executeUpdate()
+  def delete(id: Long): Boolean = {
+    val nbRow = DB.withConnection { implicit connection =>
+      SQL("delete from IngredientProperty where id = {id}")
+        .on('id -> id).executeUpdate()
     }
+    nbRow >= 1
   }
 
   /**
@@ -104,8 +114,9 @@ object IngredientPropertyDao {
    *
    * @param elem IngredientProperty to delete.
    */
-  def delete(elem: IngredientProperty) {
-    if (elem.name.isDefined)
-      delete(elem.name.get)
+  def delete(elem: IngredientProperty): Boolean = {
+    if (elem.id.isDefined)
+      delete(elem.id.get)
+    else false
   }
 }

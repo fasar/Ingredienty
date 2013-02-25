@@ -5,7 +5,6 @@ import play.api.test._
 import play.api.test.Helpers._
 import models.IngredientFamily
 import anorm._
-import org.hibernate.validator.constraints.NotEmpty
 
 class IngredientFamilySpec extends Specification {
 
@@ -32,10 +31,11 @@ class IngredientFamilySpec extends Specification {
     }
     
     "modify a family"  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-      val elem = IngredientDao.findAll(0)
-      val ingredientFamilyModifier:IngredientFamily = IngredientFamily(elem.id, "AUTRE")
-      ingredientFamilyModifier.id.get must beGreaterThanOrEqualTo(1L)
-      ingredientFamilyModifier.name must beEqualTo("AUTRE")
+      val elem = IngredientFamilyDao.findAll(0)
+      val ingredientFamilyModified:IngredientFamily = IngredientFamily(elem.id, "AUTRE")
+      ingredientFamilyModified.id.get must beGreaterThanOrEqualTo(1L)
+      ingredientFamilyModified.name must beEqualTo("AUTRE")
+      IngredientFamilyDao.update(elem.id.get, ingredientFamilyModified) must beTrue
     }
     
     "delete a family"  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {

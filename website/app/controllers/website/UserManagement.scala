@@ -7,6 +7,7 @@ import play.api.data._
 import play.api.data.Forms._
 import views._
 import models.User
+import models.dao.UserDao
 
 object UserManagement extends Controller {
 
@@ -17,7 +18,7 @@ object UserManagement extends Controller {
       "email" -> text,
       "password" -> text
     ) verifying ("Invalid email or password", result => result match {
-      case (email, password) => User.authenticate(email, password).isDefined
+      case (email, password) => UserDao.authenticate(email, password).isDefined
     })
   )
 

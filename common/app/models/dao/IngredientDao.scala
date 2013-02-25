@@ -80,7 +80,7 @@ object IngredientDao {
       val nbRow:Int = SQL(
         """
           update Ingredient
-          set name = {name}, family_id = {family_id}
+          set name = {name}, ingredientFamily_id = {family_id}
           where id = {id}
         """
       ).on(

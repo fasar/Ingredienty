@@ -34,7 +34,7 @@ case class Ingredient(id: Pk[Long] = NotAssigned,
       val propertyName =
         if(elem.ingredientPropertyId.isDefined) {
           val ingredientProperty = IngredientPropertyDao.findById(elem.ingredientPropertyId.get)
-          val propertyNameOpt = ingredientProperty.map{_.name.get}
+          val propertyNameOpt = ingredientProperty.map{_.name}
           propertyNameOpt.getOrElse {
             log.error("can't found the good propertyId \""+elem+"\" of ingredient :" + this)
             "PropertyNameNotFound"

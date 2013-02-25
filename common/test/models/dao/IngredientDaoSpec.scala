@@ -5,7 +5,6 @@ import play.api.test._
 import play.api.test.Helpers._
 import models.Ingredient
 import anorm._
-import org.hibernate.validator.constraints.NotEmpty
 
 class IngredientDaoSpec extends Specification {
 
@@ -34,6 +33,7 @@ class IngredientDaoSpec extends Specification {
       val ingredientModified:Ingredient = Ingredient(ingredient.id, "AUTRE", ingredient.familyId)
       ingredientModified.id.get must beGreaterThanOrEqualTo(1L)
       ingredientModified.name must beEqualTo("AUTRE")
+      IngredientDao.update(ingredient.id.get, ingredientModified) must beTrue
     }
     
     "delete an ingredient"  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {

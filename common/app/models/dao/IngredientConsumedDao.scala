@@ -26,7 +26,7 @@ object IngredientConsumedDao {
       get[Option[Long]]("recipe_id") ~
       get[Double]("quantity")  map {
          case ingredient_id~email~cdate~recipe_id~quantity =>
-           val userOpt = User.findByEmail(email)
+           val userOpt = UserDao.findByEmail(email)
            val ingredientOpt = IngredientDao.findById(ingredient_id)
            val recipeOpt = recipe_id map { Recipe.findById(_)}
            IngredientConsumed(userOpt.get, cdate, 
