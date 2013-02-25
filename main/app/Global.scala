@@ -8,8 +8,6 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     log.info("Application has started")
-    Logger.info("Initialize Ebean server")
-
 
   }
 

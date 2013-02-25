@@ -75,9 +75,9 @@ object IngredientDao {
    * Update a computer.
    * Param id, Object
    */
-  def update(id:Long, elem: Ingredient) = {
+  def update(id:Long, elem: Ingredient): Boolean = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val nbRow:Int = SQL(
         """
           update Ingredient
           set name = {name}, family_id = {family_id}
@@ -86,8 +86,9 @@ object IngredientDao {
       ).on(
         'id -> id,
         'name -> elem.name,
-        'family -> elem.family_id
+        'family_id -> elem.familyId
       ).executeUpdate()
+      nbRow == 1
     }
   }
 
@@ -97,9 +98,9 @@ object IngredientDao {
    *
    * param : the object
    */
-  def insert(elem: Ingredient) = {
+  def insert(elem: Ingredient): Option[Ingredient] = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val id = SQL(
         """
           insert into Ingredient values (
             (select next value for ingredient_seq),
@@ -108,8 +109,10 @@ object IngredientDao {
         """
       ).on(
         'name -> elem.name,
-        'family -> elem.family_id
-      ).executeUpdate()
+        'family_id -> elem.familyId
+      ).executeInsert()
+      val res = id map {x=> Ingredient(Id(x), elem.name, elem.familyId)}
+      res
     }
   }
 
@@ -118,10 +121,11 @@ object IngredientDao {
    *
    * @param id Id of the Ingredient to delete.
    */
-  def delete(id: Long) = {
+  def delete(id: Long): Boolean = {
     DB.withConnection { implicit connection =>
-      SQL("delete from Ingredient where id = {id}")
+      val res = SQL("delete from Ingredient where id = {id}")
         .on('id -> id).executeUpdate()
+      res == 1
     }
   }
 
@@ -130,8 +134,9 @@ object IngredientDao {
    *
    * @param elem Ingredient to delete.
    */
-  def delete(elem: Ingredient) {
+  def delete(elem: Ingredient): Boolean = {
     if (elem.id.isDefined)
       delete(elem.id.get)
+    else false
   }
 }

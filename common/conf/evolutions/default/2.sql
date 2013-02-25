@@ -45,8 +45,12 @@ CREATE TABLE Ingredient_IngredientProperty_Map (
 
 create sequence ingredient_seq;
 create sequence IngredientFamily_seq;
+ALTER SEQUENCE IngredientFamily_seq RESTART WITH 10000;
 create sequence IngredientProperty_seq;
+ALTER SEQUENCE IngredientProperty_seq RESTART WITH 10000;
 create sequence ingredients_list_seq;
+ALTER SEQUENCE ingredients_list_seq RESTART WITH 10000;
+
 
 alter table ingredient add constraint fk_ingredient_family_1 foreign key (ingredientFamily_id) references IngredientFamily (id) on delete restrict on update restrict;
 create index ix_ingredient_family_1 on ingredient (ingredientFamily_id);

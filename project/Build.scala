@@ -19,9 +19,9 @@ object ApplicationBuild extends Build {
   val aamain = play.Project(
     appName, appVersion, appDependencies, path = file("main")
   ).dependsOn(
-    website, adminArea
+    website, adminArea, common
   ).aggregate(
-    website, adminArea
+    website, adminArea, common
   )
 
   lazy val common = play.Project(

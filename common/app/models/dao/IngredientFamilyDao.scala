@@ -50,9 +50,9 @@ object IngredientFamilyDao {
    * Update an IngredientFamily.
    * Param id, Object
    */
-  def update(id:Long, elem: IngredientFamily) = {
+  def update(id:Long, elem: IngredientFamily): Boolean = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val nbRow = SQL(
         """
           update IngredientFamily
           set name = {name}
@@ -62,6 +62,7 @@ object IngredientFamilyDao {
         'id -> id,
         'name -> elem.name
       ).executeUpdate()
+      nbRow >= 1
     }
   }
 
@@ -71,18 +72,19 @@ object IngredientFamilyDao {
    *
    * param : the object
    */
-  def insert(elem: IngredientFamily) = {
+  def insert(elem: IngredientFamily):Option[IngredientFamily] = {
     DB.withConnection { implicit connection =>
-      SQL(
+      val resId =  SQL(
         """
-          insert into IngredientFamily values (
+          insert into IngredientFamily (id, name) values (
             (select next value for IngredientFamily_seq),
             {name}
           )
         """
       ).on(
         'name -> elem.name
-      ).executeUpdate()
+      ).executeInsert()
+      resId map {id => IngredientFamily(Id(id), elem.name) }
     }
   }
 

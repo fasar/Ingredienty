@@ -14,13 +14,14 @@ import play.api.libs.functional.syntax._
 
 case class Ingredient(id: Pk[Long] = NotAssigned,
                       name:String,
-                      family_id: Option[Long]) {
+                      familyId: Option[Long]) {
 
   private val log = Logger(classOf[Ingredient])
 
   lazy val family:Option[IngredientFamily] = {
-    IngredientFamilyDao.findById(family_id.get)
+    IngredientFamilyDao.findById(familyId.get)
   }
+  
   lazy val familyStr:String = {
     if (family.isDefined) {
       family.get.name
@@ -48,19 +49,3 @@ case class Ingredient(id: Pk[Long] = NotAssigned,
     res.toMap
   }
 }
-
-
-case class IngredientFamily(id: Pk[Long] = NotAssigned,
-                            name: String)
-
-
-case class IngredientProperty(name: Pk[String],
-                              description: Option[String],
-                              unit_id:Long)
-
-
-
-
-case class IngredientIngredientPropertyMap(ingredientId: Pk[Long],
-                                           ingredientPropertyId: Pk[Long],
-                                           value: String )
