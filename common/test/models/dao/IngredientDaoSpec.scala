@@ -10,7 +10,6 @@ class IngredientDaoSpec extends Specification {
 
   "IngredientDao" should {
     
-
     "create a new ingredient without a key"  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
       val ingredient= Ingredient(NotAssigned, "Carottes", None)
       val res = IngredientDao.insert(ingredient)

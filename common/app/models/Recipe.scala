@@ -8,7 +8,7 @@ import play.api.Play.current
 import play.api.Logger
 import java.util.Date
 
-import models.dao.{ IngredientDao, UserDao }
+import models.dao.{ IngredientDao, UserDao, IngredientRecipeQuantityDao }
 
 case class Recipe(id: Pk[Long] = NotAssigned,
                   name: String,
@@ -21,8 +21,6 @@ case class Recipe(id: Pk[Long] = NotAssigned,
                   ingredients: List[(Ingredient, Double)])
 
 object Recipe {
-  private type ThisType = Recipe
-
   def apply(id: Option[Long],
             name: String,
             instructions: String,
@@ -55,7 +53,7 @@ object Recipe {
   }
 
   private def getIngredientsQuantities(id: Pk[Long]): List[(Ingredient, Double)] = {
-    val ingredientQuantities = IngredientRecipeQuantity.findByRecipeId(id.get)
+    val ingredientQuantities = IngredientRecipeQuantityDao.findByRecipeId(id.get)
     (for (
       ingredientQuantity <- ingredientQuantities;
       ingredientOpt = IngredientDao.findById(ingredientQuantity.ingredientId.get) if ingredientOpt.isDefined;
@@ -65,244 +63,5 @@ object Recipe {
       ingredient -> quantity
     })
   }
-
-  // -- Parsers
-
-  /**
-   * Parse a Recipe from a ResultSet
-   */
-  private val simple = {
-    get[Pk[Long]]("id") ~
-      get[String]("name") ~
-      get[String]("instructions") ~
-      get[Option[String]]("author_email") ~
-      get[Boolean]("is_public") ~
-      get[String]("description") ~
-      get[Int]("prep_time_sec") ~
-      get[Int]("cook_time_sec") map {
-        case id ~ name ~ instructions ~ author ~ ispublic ~ description ~ prepTimeSec ~ cookTimeSec =>
-          Recipe(id, name, instructions, author, ispublic, description, prepTimeSec, cookTimeSec)
-      }
-  }
-
-  // -- Queries
-
-  /**
-   * Retrieve all Recipes.
-   */
-  def findAll: Seq[ThisType] = {
-    DB.withConnection { implicit connection =>
-      SQL("select * from Recipe").as(this.simple *)
-    }
-  }
-
-  /**
-   * Retrieve a Recipe from an id.
-   */
-  def findById(id: Long): Option[ThisType] = {
-    DB.withConnection { implicit connection =>
-      SQL("select * from Recipe where id = {id}").on(
-        'id -> id).as(this.simple.singleOpt)
-    }
-  }
-
-  /**
-   * Create a Recipe.
-   */
-  def create(element: ThisType): Option[ThisType] = {
-    DB.withTransaction { implicit connection =>
-      val id: Option[Long] = SQL(
-        """
-          insert into recipe (name, instructions, author_email, is_public, description, prep_time_sec, cook_time_sec)
-          values (
-            {name}, {instructions}, {authorEmail},
-            {is_public}, {description}, {prepTimeSec}, {cookTimeSec}
-          )
-        """).on(
-          'name -> element.name,
-          'instructions -> element.instructions,
-          'authorEmail -> element.author.map{_.email},
-          'is_public -> element.isPublic,
-          'description -> element.description,
-          'prepTimeSec -> element.prepTimeSec,
-          'cookTimeSec -> element.cookTimeSec).executeInsert()
-      id.map { id =>
-        val recipe = Recipe(Id(id), element.name,
-          element.instructions, element.author,
-          element.isPublic, element.description,
-          element.prepTimeSec, element.cookTimeSec,
-          element.ingredients)
-        createIngredientsQuantities(recipe)
-        recipe
-      }
-    }
-  }
-
-  private def createIngredientsQuantities(recipe: Recipe)(implicit connection: java.sql.Connection) = {
-    val ingredientsQuantities = recipe.ingredients
-    for ((ingredient, quantity) <- ingredientsQuantities) {
-      SQL(
-        """
-          insert into IngredientsRecipeQuantity_Map values (
-            {recipe_id}, {ingredient_id}, {quantity}
-          )
-        """).on(
-          'recipe_id -> recipe.id.get,
-          'ingredient_id -> ingredient.id.get,
-          'quantity -> quantity).executeUpdate()
-    }
-  }
-
-  /**
-   * Update a Recipe.
-   */
-  def update(element: ThisType): Option[ThisType] = {
-    if (element.id.isDefined) {
-      DB.withTransaction { implicit connection =>
-        SQL(
-          """
-              update Recipe
-              set 
-                name={name}, instructions={instructions}, author_email={authorEmail},
-                is_public={is_public}, description={description}, 
-                prep_time_sec={prepTimeSec}, cook_time_sec={cookTimeSec}
-              where id = {recipeId}
-            """).on(
-            'recipeId -> element.id.get,
-            'name -> element.name,
-            'instructions -> element.instructions,
-            'authorEmail -> element.author.map{_.email},
-            'is_public -> element.isPublic,
-            'description -> element.description,
-            'prepTimeSec -> element.prepTimeSec,
-            'cookTimeSec -> element.cookTimeSec).executeUpdate()
-          deleteAllIngredients(element)
-          createIngredientsQuantities(element)
-          Some(element)
-        }
-      } else None
-
-  }
-  /**
-   * Delete a all ingredients of a recipe
-   *
-   * @param element IngredientRecipeQuantity to delete.
-   */
-  private def deleteAllIngredients(recipe: Recipe)(implicit connection: java.sql.Connection) = {
-    val ingredientsQuantities = recipe.ingredients
-    for (recipeId <- recipe.id) {
-      SQL(
-        """
-          delete from IngredientsRecipeQuantity_Map
-	  where recipe_id = {recipeId}
-        """).on(
-          'recipeId -> recipeId
-        ).executeUpdate()
-    }
-  }
-  
-  
-  /**
-   * Delete a Recipe.
-   *
-   * @param id Id of the Recipe to delete.
-   */
-  def delete(id: Long) {
-    DB.withConnection { implicit connection =>
-      SQL("delete from recipe where id = {id}")
-        .on('id -> id).executeUpdate()
-    }
-  }
-
-  /**
-   * Delete a Recipe.
-   *
-   * @param element Recipe to delete.
-   */
-  def delete(element: ThisType) {
-    if (element.id.isDefined) { delete(element.id.get); }
-  }
-
-  
-}
-
-case class IngredientRecipeQuantity(
-  recipeId: Pk[Long],
-  ingredientId: Pk[Long],
-  quantity: Double);
-
-object IngredientRecipeQuantity {
-  type ThisType = IngredientRecipeQuantity
-
-  // -- Parsers
-  /**
-   * Parse a User from a ResultSet
-   */
-  private val simple = {
-    get[Pk[Long]]("recipe_id") ~
-      get[Pk[Long]]("ingredient_id") ~
-      get[Double]("quantity") map {
-        case recipeId ~ ingredientId ~ quantity => IngredientRecipeQuantity(recipeId, ingredientId, quantity)
-      }
-  }
-
-  /**
-   * Retrieve a IngredientRecipeQuantity from email.
-   */
-  def findByRecipeId(recipe_id: Long): List[ThisType] = {
-    DB.withConnection { implicit connection =>
-      SQL("select * from IngredientsRecipeQuantity_Map where recipe_id = {recipe_id}").on(
-        'recipe_id -> recipe_id).as(this.simple *)
-    }
-  }
-
-  /**
-   * Create an IngredientRecipeQuantity.
-   */
-  def create(element: ThisType): ThisType = {
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          insert into IngredientsRecipeQuantity_Map values (
-            {recipe_id}, {ingredient_id}, {quantity}
-          )
-        """).on(
-          'recipe_id -> element.recipeId,
-          'ingredient_id -> element.ingredientId,
-          'quantity -> element.quantity).executeUpdate()
-
-      element
-
-    }
-  }
-
-  /**
-   * Delete an IngredientRecipeQuantity.
-   *
-   * @param recipeId of the IngredientRecipeQuantity to delete.
-   */
-  def delete(recipeId: Long, ingredientId: Long) = {
-    DB.withConnection { implicit connection =>
-      SQL(
-        "delete from IngredientsRecipeQuantity_Map where recipe_id = {recipe_id} and ingredient_id = {ingredient_id}").on(
-          'recipe_id -> recipeId,
-          'ingredient_id -> ingredientId).executeUpdate()
-    }
-  }
-
-  /**
-   * Delete a IngredientRecipeQuantity.
-   *
-   * @param element IngredientRecipeQuantity to delete.
-   */
-  def delete(element: ThisType) {
-    for (
-      recepeId <- element.recipeId;
-      ingredientId <- element.ingredientId
-    ) {
-      delete(recepeId, ingredientId)
-    }
-  }
-  
 
 }

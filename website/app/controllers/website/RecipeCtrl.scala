@@ -11,7 +11,7 @@ import views._
 
 import html.helper.repeat
 import models._
-import models.dao.{ UnitDao, IngredientDao }
+import models.dao._
 import anorm._
 
 import play.api.libs.json._
@@ -24,7 +24,7 @@ object RecipeCtrl extends Controller {
 
   def recipes = Action {
     log.debug("Get all recipes")
-    Ok(views.html.recipe.recipes(Recipe.findAll))
+    Ok(views.html.recipe.recipes(RecipeDao.findAll))
   }
 
 
@@ -37,7 +37,7 @@ object RecipeCtrl extends Controller {
    * @return
    */
   def show(id: Long) = Action{
-    val existingRecipe = Recipe.findById(id)
+    val existingRecipe = RecipeDao.findById(id)
     existingRecipe match {
       case Some(r: Recipe) => Ok(views.html.recipe.summary(r))
       case None => NotFound
@@ -59,17 +59,17 @@ object RecipeCtrl extends Controller {
         recipe.id match {
           case NotAssigned =>
             log.debug("Get a new recipe : " + recipe)
-            val res = Recipe.create(recipe)
+            val res = RecipeDao.insert(recipe)
             res match {
               case Some(e:Recipe) => Ok {views.html.recipe.summary(e) }
               case None => Forbidden
             }
           case Id(id) =>
             log.debug("Update a recipe : " + recipe)
-            val res = Recipe.update(recipe)
+            val res = RecipeDao.update(id, recipe)
             res match {
-              case Some(e:Recipe) => Ok{views.html.recipe.summary(e)}
-              case None => NotFound
+              case true => Ok{views.html.recipe.summary(recipe)}
+              case false => NotFound
             }
         }
       }
@@ -81,7 +81,7 @@ object RecipeCtrl extends Controller {
    * Display a form pre-filled with an existing Contact.
    */
   def editForm(id: Long) = Action {
-    val existingRecipe = Recipe.findById(id)
+    val existingRecipe = RecipeDao.findById(id)
     existingRecipe match {
       case Some(r: Recipe) => Ok(views.html.recipe.form(recipeForm.fill(r)))
       case None => NotFound
