@@ -1,0 +1,82 @@
+@(dateStr: String, pingredients: List[IngredientConsumed])
+
+@import views.html._
+
+
+@main("Affichage des ingrédients consomés", s"Journée du ${dateStr}" ) {
+
+  <table class="table table-bordered">
+  <thead>
+   <tr>
+    <th>Id</th>
+    <th>Quantité</th>
+    <th width="300">Nom</th>
+    <th>Famille</th>
+    @*<th>Glucides/100gr</th>
+    <th>Lipides/100gr</th>
+    <th>Protéines/100gr</th>*@
+    <th>Glucides</th>
+    <th>Lipides</th>
+    <th>Protéines</th>
+   </tr>
+  </thead>
+  <tbody>
+  @for(ing <- pingredients) {
+   <tr>
+    <td>@ing.ingredient.id.get</td>
+    <td>@ing.quantity</td>
+    <td widtd="300">@ing.ingredient.name</td>
+    <td>@{(ing.ingredient.family map {_.name }).getOrElse("");}</td>
+    @*<td>@ing.ingredient("Glucides").getOrElse("Pas de données")</td>
+    <td>@ing.ingredient("Lipides").getOrElse("Pas de données")</td>
+    <td>@ing.ingredient("Protéines").getOrElse("Pas de données")</td>*@
+    <td>@{
+           val res = ing.ingredient.glucides.getOrElse(0.0) * ing.quantity / 100.0;
+           f"$res%1.2f"
+         }
+    </td>
+    <td>@{
+           val res = ing.ingredient.lipides.getOrElse(0.0) * ing.quantity / 100.0;
+           f"$res%1.2f"
+         }
+    </td>
+    <td>@{
+           val res = ing.ingredient.proteines.getOrElse(0.0) * ing.quantity / 100.0;
+           f"$res%1.2f"
+         }
+    </td>
+   </tr>
+  }
+  </tbody>
+  <tfoot>
+   <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>Total : </td>
+    @*<td>Glucides/100gr</td>
+    <td>Lipides/100gr</td>
+    <td>Protéines/100gr</td>*@
+    @{
+      val res = pingredients.foldLeft((0.0, 0.0, 0.0)) { 
+        case((glucAc, lipAc, protAc), elem) => 
+           val gluc = (elem.ingredient.glucides.getOrElse(0.0) * elem.quantity / 100.0)
+           val lip = (elem.ingredient.lipides.getOrElse(0.0) * elem.quantity / 100.0)
+           val prot = (elem.ingredient.proteines.getOrElse(0.0) * elem.quantity / 100.0)
+           (glucAc+gluc, lipAc+lip, protAc+prot)
+      }
+      Html(f"""
+      <td>${res._1}%1.2f</td>
+      <td>${res._2}%1.2f</td>
+      <td>${res._3}%1.2f</td>
+      """)
+    }
+
+   </tr>
+  </tfoot>
+ </table>
+
+
+
+
+}
