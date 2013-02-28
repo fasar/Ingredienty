@@ -9,12 +9,14 @@ GET     /logout                             controllers.website.UserManagement.l
 
 # Home page
 GET     /                                   controllers.website.Application.index
+POST    /addIngredient                      controllers.website.Application.addIngredient
+
 
 # Ingredients pages
-GET     /ingredients                        controllers.website.Application.ingredients
-GET     /ingredients/startwith.json         controllers.website.Application.ingredientsQuery
-GET     /ingredient/:id/apports.json        controllers.website.Application.ingredientApports(id:Long)
-GET     /ingredient/cherche                 controllers.website.Application.ingredientCherche
+GET     /ingredients                        controllers.website.IngredientCtrl.ingredients
+GET     /ingredients/startwith.json         controllers.website.IngredientCtrl.ingredientsQuery
+GET     /ingredient/:id/apports.json        controllers.website.IngredientCtrl.ingredientApports(id:Long)
+GET     /ingredient/cherche                 controllers.website.IngredientCtrl.ingredientCherche
 
 
 
@@ -23,7 +25,8 @@ GET     /recettes                           controllers.website.RecipeCtrl.recip
 GET     /recette                            controllers.website.RecipeCtrl.form
 POST    /recette                            controllers.website.RecipeCtrl.submit
 GET     /recette/:id                        controllers.website.RecipeCtrl.show(id:Long)
-GET     /recette/:id/edit                   controllers.website.RecipeCtrl.editForm(id:Long)
+GET     /recette/:id/edit                   controllers.website.RecipeCtrl.edit(id:Long)
+GET     /recette/:id/delete                 controllers.website.RecipeCtrl.delete(id:Long)
 
 ## Map static resources from the /public folder to the /assets URL path
 GET     /myassets/*file                     controllers.website.Assets.at(path="/public", file)

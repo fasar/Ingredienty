@@ -45,6 +45,13 @@ body {
     border-left: 1px solid #eee;
 }
 
+.help-inline {
+    color: rgb(204, 0, 0);
+}
+dd.error {
+    color: rgb(204, 0, 0);
+}
+
 .topbar .btn {
     border: 0;
 }
@@ -69,6 +76,21 @@ body {
     display: inline-block;
 }
 
+/* Sections
+-------------------------------------------------- */
+
+/* padding for in-page bookmarks and fixed navbar */
+section {
+  padding-top: 10px;
+}
+section > .page-header,
+section > .lead {
+  color: #5a5a5a;
+}
+section > ul li {
+  margin-bottom: 5px;
+}
+
 .manage {
     margin-left: 32px;
     margin-bottom: 20px;
@@ -81,3 +103,4 @@ body {
 .hidden_field {
 	display: none;
 }
+		

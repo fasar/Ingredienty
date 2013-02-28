@@ -1,46 +1,50 @@
-@(title: String)(content: Html)
+@(title: String, titleComplement:String="", navRub:String="")(content: Html)
 <!DOCTYPE html>
 <html>
-    <head>
-       <title>@title</title>
-       <link rel="stylesheet" media="screen" href="@{controllers.website.routes.Assets.at("stylesheets/bootstrap.css")}">
-       <link rel="stylesheet" media="screen" href="@{controllers.website.routes.Assets.at("stylesheets/main.css")}">
-       <script src="@controllers.website.routes.Assets.at("javascripts/jquery-1.9.0.js")"></script>
-    </head>
+ <head>
+    <title>@title</title>
+    <link rel="stylesheet" media="screen" href="@{controllers.website.routes.Assets.at("css/ui-lightness/jquery-ui-1.10.1.custom.min.css")}">
+    <link rel="stylesheet" media="screen" href="@{controllers.website.routes.Assets.at("stylesheets/bootstrap.css")}">
+    <link rel="stylesheet" media="screen" href="@{controllers.website.routes.Assets.at("stylesheets/main.css")}">
+    <script src="@controllers.website.routes.Assets.at("javascripts/jquery-1.9.1.min.js")"></script>
+    <script src="@controllers.website.routes.Assets.at("javascripts/jquery-ui-1.10.0.custom.min.js")"></script>
+    <script src="@controllers.website.routes.Assets.at("javascripts/jquery.flot.js")"></script>
+    <script src="@controllers.website.routes.Assets.at("javascripts/jquery.flot.pie.js")"></script>
+ </head>
 
-    <body>
-
-    <div class="topbar">
-        <div class="fill">
-            <div class="container">
-                <a class="brand" href="@controllers.website.routes.Application.index()">Ingredienty</a>
-                <ul class="nav">
-                    <li class="active">
-                    <a href="/">Sign up</a>
-                    </li>
-                    <li class=" ">
-                    <a href="/">Contacts</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+ <body>
+ 
+  <!-- Navbar
+     ================================================== -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+          <a class="brand" href="@controllers.website.routes.Application.index()">Ingredienty</a>
+          <ul class="nav">
+              <li class="@if(navRub=="recipes"){active}">
+              <a href="@controllers.website.routes.RecipeCtrl.recipes()">Recettes</a>
+              </li>
+              <li class="">
+              <a href="/">Contacts</a>
+              </li>
+          </ul>
+          </div>
+      </div>
+  </div>
 
     <div class="container">
-
         <div class="content">
-
+          <!-- Subhead ================================================== -->
+          <header class="jumbotron subhead" id="overview">
             <div class="page-header">
-                <h1>
-                @title
-                </h1>
+              <h1>@title</h1>
+              <p class="lead">@titleComplement</p>
             </div>
+          </header>
 
-            <div class="row">
-                <div class="span14">
-                    @content
-                </div>
-            </div>
+           <div>
+                 @content
+           </div>
 
         </div>
 
@@ -53,4 +57,5 @@
     </div>
 
     </body>
+
 

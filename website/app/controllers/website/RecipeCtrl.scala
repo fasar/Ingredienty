@@ -80,10 +80,20 @@ object RecipeCtrl extends Controller {
   /**
    * Display a form pre-filled with an existing Contact.
    */
-  def editForm(id: Long) = Action {
+  def edit(id: Long) = Action {
     val existingRecipe = RecipeDao.findById(id)
     existingRecipe match {
       case Some(r: Recipe) => Ok(views.html.recipe.form(recipeForm.fill(r)))
+      case None => NotFound
+    }
+  }
+  
+  def delete(id: Long) = Action {
+    val existingRecipe = RecipeDao.findById(id)
+    existingRecipe match {
+      case Some(r: Recipe) => 
+        RecipeDao.delete(r)
+        Redirect(routes.RecipeCtrl.recipes)
       case None => NotFound
     }
   }

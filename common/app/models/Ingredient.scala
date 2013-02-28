@@ -18,6 +18,10 @@ case class Ingredient(id: Pk[Long] = NotAssigned,
 
   private val log = Logger(classOf[Ingredient])
 
+  def apply(property:String) : Option[String] = {
+    properties.get(property)
+  }
+  
   lazy val family:Option[IngredientFamily] = {
     IngredientFamilyDao.findById(familyId.get)
   }
@@ -28,7 +32,9 @@ case class Ingredient(id: Pk[Long] = NotAssigned,
     } else ""
   }
 
-  lazy val ingredientProperties:Map[String, String] = {
+  
+  
+  lazy val properties:Map[String, String] = {
     val properties = IngredientIngredientPropertyMapDao.findByIngredient(this)
     val res = properties.map {elem =>
       val propertyName =
@@ -47,5 +53,30 @@ case class Ingredient(id: Pk[Long] = NotAssigned,
     }
 
     res.toMap
+  }
+  
+  def glucides: Option[Double] = {
+    try {
+      val elOpt = properties.get("Glucides")
+      elOpt map { x => x.toDouble }
+    } catch {
+      case e:Exception => None
+    }
+  }
+  def lipides: Option[Double] = {
+    try {
+      val elOpt = properties.get("Lipides")
+      elOpt map { x => x.toDouble }
+    } catch {
+      case e:Exception => None
+    }
+  }
+  def proteines: Option[Double] = {
+    try {
+      val elOpt = properties.get("Protéines")
+      elOpt map { x => x.toDouble }
+    } catch {
+      case e:Exception => None
+    }
   }
 }

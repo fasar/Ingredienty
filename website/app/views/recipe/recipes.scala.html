@@ -1,14 +1,24 @@
 @(recettes: Seq[Recipe])
 
-@main("Recettes"){
-<table border="1">
+@main("Recettes", navRub = "recipes"){
+
+<section id="addNewRecipe">
+<div class="row">
+ <a class="btn btn-primary" href="@controllers.website.routes.RecipeCtrl.form()">Add a new recipe</a>
+</div>
+</section>
+ 
+<section id="showRecipes">
+<div class="row">
+<table class="table table-bordered">
 <thead>
   <tr>
-    <td>Id</td>
-    <td>Nom</td><td>Description</td>
-    <td>Temps de préparation</td>
-    <td>Temps de cuisson</td>
-    <td>Auteur</td>
+    <th>Id</th>
+    <th>Nom</th><th>Description</th>
+    <th>Temps de préparation</th>
+    <th>Temps de cuisson</th>
+    <th>Auteur</th>
+    <th>Modifier</th>
   </tr>
 </thead>
 <tbody>
@@ -20,10 +30,21 @@
     <td>@recette.prepTimeSec</td>
     <td>@recette.cookTimeSec</td>
     <td>@recette.author</td>
+    <td>
+      <a href="@controllers.website.routes.RecipeCtrl.edit(recette.id.get)">
+        <button class="btn btn-primary" type="button">Éditer</button>
+      </a>
+      <a href="@controllers.website.routes.RecipeCtrl.delete(recette.id.get)">
+        <button class="btn btn-danger" type="button">Supprimer</button>
+      </a>
+    </td>
   </tr>
  }
 </tbody>
 </table>
+</div>
+</section>
+
 
 
 }

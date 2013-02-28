@@ -38,7 +38,9 @@ INSERT INTO IngredientsRecipeQuantity_Map(recipe_id, ingredient_id, quantity)
  VALUES (1, 2000, 20.0);
 INSERT INTO IngredientsRecipeQuantity_Map(recipe_id, ingredient_id, quantity)
  VALUES (1, 2002, 22.0);
-
+INSERT INTO IngredientsRecipeQuantity_Map(recipe_id, ingredient_id, quantity)
+ VALUES (1, 2004, 22.0);
+ 
 -- DELETE FROM Recipe WHERE id = 1;
 
  

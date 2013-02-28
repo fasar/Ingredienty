@@ -3,15 +3,15 @@
 @{val ingredientProperties = IngredientPropertyDao.findAll}
 
 @main("List des ingrédients"){
- <table border=1>
+ <table class="table table-bordered">
      <thead>
      <tr>
-         <td>Id</td>
-         <td>Name</td>
-         <td>Family</td>
-         <td>Glucides</td>
-         <td>Lipides</td>
-         <td>Protéines</td>
+         <th>Id</th>
+         <th>Name</th>
+         <th>Family</th>
+         <th>Glucides</th>
+         <th>Lipides</th>
+         <th>Protéines</th>
      </tr>
      </thead>
      <tbody>
@@ -20,9 +20,9 @@
          <td>@ingredient.id</td>
          <td>@ingredient.name</td>
          <td>@ingredient.familyStr</td>
-         <td>@ingredient.ingredientProperties("Glucides")</td>
-         <td>@ingredient.ingredientProperties("Lipides")</td>
-         <td>@ingredient.ingredientProperties("Protéines")</td>
+         <td>@ingredient.properties("Glucides")</td>
+         <td>@ingredient.properties("Lipides")</td>
+         <td>@ingredient.properties("Protéines")</td>
      </tr>
      }
      </tbody>

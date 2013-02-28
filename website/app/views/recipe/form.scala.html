@@ -6,10 +6,12 @@
 
 @ingredientsGroup(field: Field, className: String = "profile") = {
    <div class="twipsies well @className">
-     <a class="removeProfile btn danger pull-right">Remove this profile</a>
+     <a class="removeProfile btn btn-danger pull-right">Enlever</a>
+     <div class="inputIngredient">
      @helper.inputText(
         field("ingredientId"), '_label -> "Ingrédient" 
         )
+     </div>
      @helper.inputText(
         field("quantity"), '_label -> "Quantité" 
         ) 
@@ -17,7 +19,7 @@
 }
 
 
-@main("Création de recette") {
+@main("Création de recette", navRub = "recipes") {
 
 @if(myForm.hasErrors) {
 <div class="alert-message error">
@@ -63,7 +65,7 @@
       )
               
   <div class="manage">
-   <a class="addProfile btn success">Ajout d'un autre ingrédients</a>
+   <a class="addProfile btn success">Ajout d'un autre ingrédient</a>
   </div>
 
  </div>
@@ -72,8 +74,8 @@
 
 
 <div class="actions">
- <input type="submit" class="btn primary" value="Enregistrer"> <a
-  href="@controllers.website.routes.RecipeCtrl.recipes" class="btn">Annuler</a>
+ <input type="submit" class="btn primary" value="Enregistrer"> 
+ <a href="@controllers.website.routes.RecipeCtrl.recipes" class="btn">Annuler</a>
 </div>
 
 }
@@ -91,19 +93,11 @@
       template.before('<div class="twipsies well profile">'
               + template.html() + '</div>');
       renumber();
+      addAutoCompletion();
       updateRemoveBtn();
     })
 
-    @*
-    $(function() {
-        $('#ingredientToAdd').autocomplete({
-            source:  "http://localhost:9000/ingredients/startwith.json",
-            minLength: 3
-        });
-    });
-    *@
-    
-    // -- renumber fields
+// -- renumber fields
 
     // Rename fields to have a coherent payload like:
     //
@@ -115,17 +109,26 @@
     //
     // This is probably not the easiest way to do it. A jQuery plugin would help.
     
-    var renumber = function(phones) {
+    var renumber = function() {
 	$('.profile').each( function(i) {
-      $('input', this).each( function() {
-         $(this).attr( 'name',
-            $(this).attr('name').replace(/informations\[.+?\]/g, 'informations[' + i + ']'))
-         })
+	    $('input', this).each( function() {
+		   $(this).attr( 'name',
+			    $(this).attr('name').replace(/informations\[.+?\]/g, 'informations[' + i + ']')
+		   )
+		})
       })
     }
     
-    @*var addAutoCompletion = function(phones) {
-       TODO 
-    }*@
+    var addAutoCompletion = function() {
+        $('#profiles >> div.inputIngredient >* input').each(function(index, element) {
+            $(this).autocomplete({
+                source:  "http://localhost:9000/ingredients/startwith.json",
+                minLength: 3
+            });
+        })
+    }
+    $(function() {
+	       addAutoCompletion();
+    })
 </script>
 }
