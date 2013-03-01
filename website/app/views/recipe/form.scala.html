@@ -60,7 +60,7 @@
        * Keep an hidden block that will be used as template for Javascript copy code
        **@
       @ingredientsGroup(
-          myForm("informations[x]"),
+          myForm("ingredients[x]"),
           className = "profile_template"
       )
               
@@ -113,7 +113,7 @@
 	$('.profile').each( function(i) {
 	    $('input', this).each( function() {
 		   $(this).attr( 'name',
-			    $(this).attr('name').replace(/informations\[.+?\]/g, 'informations[' + i + ']')
+			    $(this).attr('name').replace(/ingredients\[.+?\]/g, 'ingredients[' + i + ']')
 		   )
 		})
       })
@@ -128,7 +128,8 @@
         })
     }
     $(function() {
-	       addAutoCompletion();
+      addAutoCompletion();
+      updateRemoveBtn();
     })
 </script>
 }

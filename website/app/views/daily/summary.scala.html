@@ -78,7 +78,6 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>Id</th>
           <th>Heure</th>
           <th>Quantité</th>
           <th width="300">Nom</th>
@@ -89,12 +88,12 @@
           <th>Glucides</th>
           <th>Lipides</th>
           <th>Protéines</th>
+          <th>Calories</th>
         </tr>
       </thead>
       <tbody>
        @for(ing <- pingredients) {
         <tr>
-        <td>@ing.ingredient.id.get</td>
         <td>@Global.dateFormaterHours.format(ing.date)</td>
         <td>
             @{
@@ -122,12 +121,19 @@
                f"$res%1.2f"
              }
         </td>
+        <td>@{
+               val glu = (ing.ingredient.glucides.getOrElse(0.0) * ing.quantity / 100.0)*4;
+               val lip = (ing.ingredient.lipides.getOrElse(0.0) * ing.quantity / 100.0)*9;
+               val pro = (ing.ingredient.proteines.getOrElse(0.0) * ing.quantity / 100.0)*4;
+               val res = glu + lip + pro
+               f"${res}%1.2f" 
+              }
+        </td>
        </tr>
       }
       </tbody>
       <tfoot>
        <tr>
-        <td></td>
         <td></td>
         <td></td>
         <td>Total : </td>
@@ -140,11 +146,11 @@
           <td>${glucides_lipides_proteines._1}%1.2f</td>
           <td>${glucides_lipides_proteines._2}%1.2f</td>
           <td>${glucides_lipides_proteines._3}%1.2f</td>
+          <td>${glucides_lipides_proteines._1*4+glucides_lipides_proteines._2*9+glucides_lipides_proteines._3*4}%1.2f</td>
           """)
         }
        </tr>
        <tr>
-        <td></td>
         <td></td>
         <td></td>
         <td>Total : </td>
@@ -166,6 +172,7 @@
           <td>$proprc%1.2f%</td>
           """)
         }
+        <td></td>
        </tr>
       </tfoot>
      </table>

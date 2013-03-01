@@ -29,7 +29,7 @@
     <td>@recette.description</td>
     <td>@recette.prepTimeSec</td>
     <td>@recette.cookTimeSec</td>
-    <td>@recette.author map {_.name}.getOrElse("")</td>
+    <td>@{recette.author.map{_.name}.getOrElse("")}</td>
     <td>
       <a href="@controllers.website.routes.RecipeCtrl.edit(recette.id.get)">
         <button class="btn btn-primary" type="button">Éditer</button>
