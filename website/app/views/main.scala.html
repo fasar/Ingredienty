@@ -19,13 +19,13 @@
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
-          <a class="brand" href="@controllers.website.routes.Application.index()">Ingredienty</a>
+          <a class="brand" href="@controllers.website.routes.Application.index("")">Ingredienty</a>
           <ul class="nav">
               <li class="@if(navRub=="recipes"){active}">
               <a href="@controllers.website.routes.RecipeCtrl.recipes()">Recettes</a>
               </li>
-              <li class="">
-              <a href="/">Contacts</a>
+              <li class="@if(navRub=="ingredients"){active}">
+              <a href="@controllers.website.routes.IngredientCtrl.ingredients">Ingredients</a>
               </li>
           </ul>
           </div>
@@ -50,7 +50,7 @@
 
         <footer>
             <p>
-                <a href="@controllers.website.routes.Application.index()">www.ingredienty.com</a>
+                <a href="@controllers.website.routes.Application.index("")">www.ingredienty.com</a>
             </p>
         </footer>
 

@@ -43,8 +43,8 @@
    @inputText(myForm("prepTimeSec"), '_label -> "Temps de préparation")
    @inputText(myForm("cookTimeSec"), '_label -> "Temps de cuisson")
    @helper.checkbox(myForm("isPublic"), '_label -> "Publique")
-   @helper.inputText(myForm("description"), '_label -> "Description")
-   @helper.inputText(myForm("instructions"), '_label -> "Instructions")
+   @helper.textarea(myForm("description"), '_label -> "Description")
+   @helper.textarea(myForm("instructions"), '_label -> "Instructions")
    @helper.inputText(myForm("author"), '_label -> "Auteur")
 </fieldset>
 

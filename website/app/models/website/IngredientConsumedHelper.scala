@@ -20,7 +20,7 @@ object IngredientConsumedHelper {
       "id" -> longNumber,
       "quantity" -> bigDecimal,
       "date" -> optional(date("dd-MM-yyyy")),
-      "hour" -> optional(date("hh:mm"))
+      "hour" -> optional(date("HH:mm"))
     )
   )
 

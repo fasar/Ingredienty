@@ -1,6 +1,7 @@
 # --- Database schema of the domain model
 
 # --- !Ups
+-- Table des unités
 create table Unit (
   id                        bigint not null,
   name                      varchar(50),
@@ -75,5 +76,6 @@ INSERT INTO Unit (id, name, name_abrv, plural, plural_abrv, cunit_type) VALUES(5
 
 SET REFERENTIAL_INTEGRITY FALSE;
 drop table if exists Unit;
-SET REFERENTIAL_INTEGRITY TRUE;
 drop sequence if exists Unit_seq;
+SET REFERENTIAL_INTEGRITY TRUE;
+

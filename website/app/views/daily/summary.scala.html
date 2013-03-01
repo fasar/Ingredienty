@@ -1,35 +1,73 @@
-@(dateStr: String, 
+@(currentDate: java.util.Date, 
    pingredients: List[IngredientConsumed], 
    myForm:Form[(Long, BigDecimal, Option[java.util.Date], Option[java.util.Date])]
+ )(
+   implicit request: RequestHeader
  )
  
 @import java.util.Date
+@import java.util.Calendar
+@import java.text.DateFormat
 @import views.html._
 @import helper._
 @import models.website.IngredientConsumedHelper
+@import controllers.website.Global
 
 @* ==== Defining a global data with Glucides, Proteines and Lipides ====*@
-@defining(
-  pingredients.foldLeft((0.0, 0.0, 0.0)) { 
+@defining({
+  val glucides_lipides_proteines = pingredients.foldLeft((0.0, 0.0, 0.0)) { 
     case((glucAc, lipAc, protAc), elem) => 
        val gluc = (elem.ingredient.glucides.getOrElse(0.0) * elem.quantity / 100.0)
        val lip = (elem.ingredient.lipides.getOrElse(0.0) * elem.quantity / 100.0)
        val prot = (elem.ingredient.proteines.getOrElse(0.0) * elem.quantity / 100.0)
        (glucAc+gluc, lipAc+lip, protAc+prot)
   }
-){ glucides_proteines_lipides =>
+  
+  val glu = glucides_lipides_proteines._1;
+  val lip = glucides_lipides_proteines._2;
+  val pro = glucides_lipides_proteines._3;
+  val total = glu*4 + lip*9 + pro*4;
+  
+  val calendar = Calendar.getInstance()
+  calendar.setTime(currentDate)
+  (glucides_lipides_proteines, calendar, total)
+}){ case (glucides_lipides_proteines, calendar, total) =>
 
 
-@main("Affichage des ingrédients consommés", s"Journée du ${dateStr}" ) {
+@main("Affichage des ingrédients consommés", 
+     f"""Journée du ${DateFormat.getDateInstance().format(currentDate)} : $total%1.0f kcal"""
+     ) {
 
 <section id="addAnIngredient">
 <div class="row">
-    @helper.form(action = controllers.website.routes.Application.addIngredient, 'id -> "addIngredient") {
+  <div class="span1">
+  @calendar.add(Calendar.MONTH, -1)
+  <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+  <<- </a> <br>
+  @calendar.add(Calendar.MONTH, 1) @calendar.add(Calendar.DAY_OF_MONTH, -1)
+  <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+  <- </a>
+   @calendar.add(Calendar.DAY_OF_MONTH, 1)
+  </div>  
+    @helper.form(action = controllers.website.routes.Application.addIngredient(Global.regexDate.findFirstIn(request.path).getOrElse("")), 'id -> "addIngredient") {
         <div class="span3 inputIngredient">
         @inputText(myForm("id"), '_label -> "Id")
-        </div><div class="span3 offset1">
-        @inputText(myForm("quantity"), '_label -> "Quantité")
-        </div><div class="span1 offset1">
+        </div>
+        <div class="span2 offset1">
+        @inputText(myForm("quantity"), '_label -> "Quantité", 'class -> "input-small")
+        </div>
+        <div class="span2">
+        @inputText(myForm("hour"), '_label -> "Heure", 'value -> (new Date()), 'class -> "input-small")
+        </div>
+        
+        <div class="span1">
+            @calendar.add(Calendar.MONTH, 1)
+            <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+            ->> </a> <br>
+            @calendar.add(Calendar.MONTH, -1) @calendar.add(Calendar.DAY_OF_MONTH, 1)
+            <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+            -> </a>
+            @calendar.add(Calendar.DAY_OF_MONTH, -1)
         <input type="submit" class="btn primary" value="Ajouter"> 
         </div>
     }
@@ -41,6 +79,7 @@
       <thead>
         <tr>
           <th>Id</th>
+          <th>Heure</th>
           <th>Quantité</th>
           <th width="300">Nom</th>
           <th>Famille</th>
@@ -56,6 +95,7 @@
        @for(ing <- pingredients) {
         <tr>
         <td>@ing.ingredient.id.get</td>
+        <td>@Global.dateFormaterHours.format(ing.date)</td>
         <td>
             @{
                val res = ing.quantity;
@@ -91,19 +131,48 @@
         <td></td>
         <td></td>
         <td>Total : </td>
+        <td></td>
         @*<td>Glucides/100gr</td>
         <td>Lipides/100gr</td>
         <td>Protéines/100gr</td>*@
         @{
           Html(f"""
-          <td>${glucides_proteines_lipides._1}%1.2f</td>
-          <td>${glucides_proteines_lipides._2}%1.2f</td>
-          <td>${glucides_proteines_lipides._3}%1.2f</td>
+          <td>${glucides_lipides_proteines._1}%1.2f</td>
+          <td>${glucides_lipides_proteines._2}%1.2f</td>
+          <td>${glucides_lipides_proteines._3}%1.2f</td>
+          """)
+        }
+       </tr>
+       <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>Total : </td>
+        <td></td>
+        @*<td>Glucides/100gr</td>
+        <td>Lipides/100gr</td>
+        <td>Protéines/100gr</td>*@
+        @{
+          val glu = glucides_lipides_proteines._1
+          val lip = glucides_lipides_proteines._2
+          val pro = glucides_lipides_proteines._3
+          val total = glu + lip + pro
+          val gluprc = (glu / total * 100)
+          val lipprc = (lip / total * 100)
+          val proprc = (pro / total * 100)
+          Html(f"""
+          <td>$gluprc%1.2f%</td>
+          <td>$lipprc%1.2f%</td>
+          <td>$proprc%1.2f%</td>
           """)
         }
        </tr>
       </tfoot>
      </table>
+</section>
+
+<section id="summary">
+Vous avez pris : @{f"$total%1.0f"} kcal
 </section>
 
 <section id="showGraph">
@@ -121,9 +190,9 @@
     
     <script type="text/javascript" charset="utf-8">   
         var data = [];
-    	data[0] = { label: "Glucides", data: @{glucides_proteines_lipides._1} };
-    	data[1] = { label: "Lipides", data: @{glucides_proteines_lipides._2} };
-    	data[2] = { label: "Protéines", data: @{glucides_proteines_lipides._3} };
+    	data[0] = { label: "Glucides", data: @{glucides_lipides_proteines._1} };
+    	data[1] = { label: "Lipides", data: @{glucides_lipides_proteines._2} };
+    	data[2] = { label: "Protéines", data: @{glucides_lipides_proteines._3} };
     
     
     	// DEFAULT

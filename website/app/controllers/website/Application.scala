@@ -15,31 +15,49 @@ import play.api.data.Form
 
  
 object Application extends Controller {
-  private val log = Logger(classOf[Application])
+  private val log = Logger(Application.getClass)
   
-  //TODO: Debug -> suppr that
+  //TODO: Debug -> suppr that and replace with a user management 
   private val user = UserDao.findAll(0)		   
       
-  //TODO: Debug -> suppr that
-  val simpleDateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss")
-  val date = simpleDateFormat.parse("20130210-125328")
-      
-  def index() = Action {
-    req => showSummary()
-
+  def index(date:String = "") = Action {implicit req => 
+    log.debug(s"get index page of date ${req.path}")
+    if(date != "") {
+        try {
+    	val myDate = Global.dateFormaterYearMountDate.parse(date)
+    	showSummary(currentDate = myDate)
+        } catch {
+          case e:Exception => 
+            Redirect(routes.Application.index(""))
+        }
+    } else {
+      showSummary()
+    }
+    
   }
   
   def showSummary(
-	  form:Form[(Long, BigDecimal, Option[Date], Option[Date])] = IngredientConsumedHelper.form 
-	  ) = {
-      //TODO: Manage date
-      val dateStr = DateFormat.getDateInstance().format(date)
-      val cosumed = IngredientConsumedDao.findByEmail(user.email, date)
-      Ok(views.html.daily.summary(dateStr, cosumed, form))
+	  form:Form[(Long, BigDecimal, Option[Date], Option[Date])] = IngredientConsumedHelper.form ,
+	  currentDate:Date = Calendar.getInstance.getTime)
+  	  ( implicit request:Request[AnyContent])=
+  {
+      val cosumed = IngredientConsumedDao.findByEmail(user.email, currentDate).sortBy{_.date}
+      Ok(views.html.daily.summary(currentDate, cosumed, form))
   }
   
   
-  def addIngredient() = Action { implicit req =>
+  def addIngredient(datep:String = "") = Action { implicit req =>
+    log.error("add an ingredient for user : " + datep)
+    val calendar:Calendar = try {
+	val myDate = Global.dateFormaterYearMountDate.parse(datep)
+	val res = Calendar.getInstance()
+	res.setTime(myDate)
+	res
+    } catch {
+      case e:Exception => 
+        Calendar.getInstance();
+    }
+    
     IngredientConsumedHelper.form.bindFromRequest.fold(
       // Form has errors, redisplay it
       errors => showSummary(errors),
@@ -50,15 +68,24 @@ object Application extends Controller {
         //TODO: Manage date
         ingredient match {
           case Some(ing) => 
+            val hourOpt = ingredientQuantity._4
+            hourOpt map { hour =>
+              val hourC = Calendar.getInstance()
+              hourC.setTime(hour)
+              calendar.set(Calendar.HOUR_OF_DAY, hourC.get(Calendar.HOUR_OF_DAY))
+              calendar.set(Calendar.MINUTE, hourC.get(Calendar.MINUTE))
+            }
+            val date = calendar.getTime
             val newVal = IngredientConsumed(user, date, ing, quantity.toDouble, None)
             IngredientConsumedDao.insert(newVal)
-            Redirect(routes.Application.index)
+            Redirect(routes.Application.index(datep))
           case None =>
-            Redirect(routes.Application.index)
+            Redirect(routes.Application.index(datep))
         }
-        
-	
       }
     )
   }
+  
+  
+  def addRecipe() = TODO
 }

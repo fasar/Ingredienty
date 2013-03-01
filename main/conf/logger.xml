@@ -61,7 +61,7 @@
         <appender-ref ref="PERF"/>
     </logger>
 
-    <root level="ERROR">
+    <root level="DEBUG">
         <appender-ref ref="S"/>
         <!--    <appender-ref ref="H"/>-->
         <!--    <appender-ref ref="R"/>-->

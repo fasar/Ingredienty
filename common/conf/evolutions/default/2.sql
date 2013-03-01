@@ -2,7 +2,8 @@
 
 # --- !Ups
 
-
+--Table des ingrédients
+--  Par exemple banane, steak de cheval ...
 create table Ingredient (
   id                        bigint not null,
   name                      varchar(120),
@@ -10,12 +11,15 @@ create table Ingredient (
   constraint pk_ingredient primary key (id))
 ;
 
+-- Table des familles des ingrédients
 create table IngredientFamily (
   id                        bigint not null,
   name                      varchar(50),
   constraint pk_IngredientFamily primary key (id))
 ;
 
+-- Table des propriétés des ingrédients
+--  Par exemple : protéines, glucides, vitamine A..Z
 create table IngredientProperty (
   id                        bigint not null,
   name                      varchar(50),
@@ -24,14 +28,6 @@ create table IngredientProperty (
   constraint pk_IngredientProperty primary key (id))
 ;
 
-create table Ingredients_list (
-  id                        bigint not null,
-  quantity                  double,
-  ingredient_id             bigint,
-  recipe_id                 bigint,
-  unit_id                   bigint,
-  constraint pk_ingredients_list primary key (id))
-;
 
 
 --Table qui map les ingrédients et les propriétés.
@@ -49,23 +45,18 @@ create sequence IngredientFamily_seq;
 ALTER SEQUENCE IngredientFamily_seq RESTART WITH 10000;
 create sequence IngredientProperty_seq;
 ALTER SEQUENCE IngredientProperty_seq RESTART WITH 10000;
-create sequence ingredients_list_seq;
-ALTER SEQUENCE ingredients_list_seq RESTART WITH 10000;
+
 
 ALTER TABLE IngredientProperty
   ADD FOREIGN KEY (unit_id) REFERENCES UNIT(id) ON DELETE SET null ON UPDATE CASCADE;
-ALTER TABLE Ingredients_list
-  ADD FOREIGN KEY (unit_id) REFERENCES UNIT(id) ON DELETE SET null ON UPDATE CASCADE;
+
   
   
 alter table Ingredient add constraint fk_ingredient_family_1 foreign key (ingredientFamily_id) references IngredientFamily (id) on delete restrict on update restrict;
 create index ix_ingredient_family_1 on ingredient (ingredientFamily_id);
 alter table IngredientProperty add constraint fk_IngredientProperty_unit_2 foreign key (unit_id) references Unit (id) on delete restrict on update restrict;
 create index ix_IngredientProperty_unit_2 on IngredientProperty (unit_id);
-alter table Ingredients_list add constraint fk_ingredients_list_ingredient_3 foreign key (ingredient_id) references ingredient (id) on delete restrict on update restrict;
-create index ix_ingredients_list_ingredient_3 on ingredients_list (ingredient_id);
-alter table Ingredients_list add constraint fk_ingredients_list_unit_5 foreign key (unit_id) references Unit (id) on delete restrict on update restrict;
-create index ix_ingredients_list_unit_5 on ingredients_list (unit_id);
+
 
 
 
@@ -1524,12 +1515,10 @@ SET REFERENTIAL_INTEGRITY FALSE;
 drop table if exists ingredient;
 drop table if exists IngredientFamily;
 drop table if exists IngredientProperty;
-drop table if exists ingredients_list;
 DROP TABLE if exists Ingredient_IngredientProperty_Map;
 SET REFERENTIAL_INTEGRITY TRUE;
 drop sequence if exists ingredient_seq;
 drop sequence if exists IngredientFamily_seq;
 drop sequence if exists IngredientProperty_seq;
-drop sequence if exists ingredients_list_seq;
 drop sequence if exists Ingredient_IngredientProperty_Map_seq
  

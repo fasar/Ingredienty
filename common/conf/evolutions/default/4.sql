@@ -1,5 +1,5 @@
 # --- !Ups
-
+-- Table des recettes
 create table Recipe (
   id                        bigint not null auto_increment,
   name                      varchar(255),
@@ -12,6 +12,8 @@ create table Recipe (
   constraint pk_Recipes primary key (id)
 );
 
+-- Table qui map les recettes et les ingrédients.
+-- Elle informe de la quantité de chaque ingrédients.
 create table IngredientsRecipeQuantity_Map (
   recipe_id                 bigint not null,
   ingredient_id				bigint not null,

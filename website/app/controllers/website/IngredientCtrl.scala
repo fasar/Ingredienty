@@ -14,15 +14,11 @@ import anorm._
 object IngredientCtrl extends Controller {
   private val log = Logger(IngredientCtrl.getClass())
 		  
-  def index = Action {
-    req =>
-      Ok(views.html.index("Ok, got a request : " + req))
-  }
 
   def ingredients = Action {
     val ingredients = IngredientDao.findAll
 
-    Ok(views.html.ingredients(ingredients))
+    Ok(views.html.ingredients.ingredients(ingredients))
   }
 
   def ingredientsQuery() = Action { implicit request =>

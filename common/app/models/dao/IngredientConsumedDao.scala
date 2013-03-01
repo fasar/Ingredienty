@@ -64,14 +64,14 @@ object IngredientConsumedDao {
   def findByEmail(email: String, cdate: Date): List[IngredientConsumed] = {
     val calendar = Calendar.getInstance()
     calendar.setTime(cdate)
-    calendar.set(Calendar.HOUR, 0)
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
     calendar.set(Calendar.MINUTE, 0)
     calendar.set(Calendar.SECOND, 0)
     calendar.set(Calendar.MILLISECOND, 0)
     val dateStart = calendar.getTime
     calendar.add(Calendar.DAY_OF_MONTH, 1)
     val dateEnd = calendar.getTime
-
+    
     DB.withConnection { implicit connection =>
       SQL("""
           select ingredient_id, email, cdate, recipe_id, quantity from ConsumedIngredient 
