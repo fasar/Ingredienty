@@ -35,7 +35,6 @@ object Application extends Controller {
     } else {
       showSummary()
     }
-    
   }
   
   def showSummary(

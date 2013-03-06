@@ -23,6 +23,10 @@ GET     /recette/:id                        controllers.website.RecipeCtrl.show(
 GET     /recette/:id/edit                   controllers.website.RecipeCtrl.edit(id:Long)
 GET     /recette/:id/delete                 controllers.website.RecipeCtrl.delete(id:Long)
 
+# Weight pages
+GET     /poids/:date                        controllers.website.WeightCtrl.index(date)
+GET     /poids                              controllers.website.WeightCtrl.index(date ="")
+
 # Home page
 GET     /                                   controllers.website.Application.index(date = "")
 GET     /:date/:hour/:idIngredient/delete   controllers.website.Application.deleteConsumedIngredient(date:String, hour:String, idIngredient:Long)

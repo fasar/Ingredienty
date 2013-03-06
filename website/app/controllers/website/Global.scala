@@ -6,6 +6,8 @@ object Global {
 
   val dateFormaterAll = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z")
   val dateFormaterHours = new SimpleDateFormat("HH:mm")
+  val dateFormaterDays = new SimpleDateFormat("dd-MM-yyyy")
+  
   val dateFormaterYearMountDate = new SimpleDateFormat("yyyyMMdd")
   val dateFormFormater = new SimpleDateFormat("dd-MM-yyyy")
   
