@@ -130,27 +130,33 @@ object IngredientConsumedDao {
    *
    * param : the object
    */
-  def insert(elem: IngredientConsumed): Option[IngredientConsumed] = {
-    val recipeId = elem.recipe map {_.id.get }
+  def insert(elem: IngredientConsumed): Boolean = {
+    insert(List(elem)) == 1
+  }
+  def insert(elems: List[IngredientConsumed]): Int = {
     DB.withConnection { implicit connection =>
-      val nbRow = SQL(
-        """
-          insert into ConsumedIngredient 
-          (ingredient_id, email, cdate, recipe_id, quantity)
-          values (
-            {ingredient_id}, {email}, {cdate},
-            {recipe_id}, {quantity}
-          )
-        """
-      ).on(
-        'ingredient_id -> elem.ingredient.id.get,
-        'email -> elem.user.email,
-        'cdate -> elem.date,
-        'recipe_id -> recipeId,
-        'quantity -> elem.quantity
-      ).executeUpdate()
-      if(nbRow >= 1) Some(elem)
-      else None
+      val listUpdate = for(elem <- elems) 
+        yield {
+          val recipeId = elem.recipe map {_.id.get }
+          val nbRow = SQL(
+            """
+              insert into ConsumedIngredient 
+              (ingredient_id, email, cdate, recipe_id, quantity)
+              values (
+                {ingredient_id}, {email}, {cdate},
+                {recipe_id}, {quantity}
+              )
+            """
+          ).on(
+            'ingredient_id -> elem.ingredient.id.get,
+            'email -> elem.user.email,
+            'cdate -> elem.date,
+            'recipe_id -> recipeId,
+            'quantity -> elem.quantity
+          ).executeUpdate()
+          nbRow >= 1
+      }
+      listUpdate.foldRight(0) { case(elem, acc:Int) => if(elem) acc + 1 else acc }
     }
   }
 
@@ -160,6 +166,16 @@ object IngredientConsumedDao {
    * @param id Id of the Ingredient to delete.
    */
   def delete(elem: IngredientConsumed):Boolean = {
+    delete(elem.ingredient.id.get, elem.user.email, elem.date)
+  }
+
+  /**
+   * Delete an object.
+   *
+   * @param id Id of the Ingredient to delete.
+   */
+  def delete(ingredientId:Long, userEmail:String, date:Date):Boolean = {
+    log.debug(s"delete ingredient for user$userEmail $ingredientId cosumed at $date")
     DB.withConnection { implicit connection =>
       val sql = SQL("""
           delete from ConsumedIngredient
@@ -168,12 +184,11 @@ object IngredientConsumedDao {
       )
       
       val nbRow = sql.on(
-          'ingredientId -> elem.ingredient.id.get,
-          'email -> elem.user.email,
-          'cdate -> elem.date
+          'ingredientId -> ingredientId,
+          'email -> userEmail,
+          'cdate -> date
       ).executeUpdate()
       nbRow >= 1
     }
   }
-
 }

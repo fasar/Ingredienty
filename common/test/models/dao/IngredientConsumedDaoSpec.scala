@@ -17,8 +17,8 @@ class IngredientConsumedDaoSpec extends Specification {
       val Some(ingredient) = IngredientDao.findById(2002)
       val ingredientc= IngredientConsumed(user, (new Date), ingredient, 22.2, None)
       val res = IngredientConsumedDao.insert(ingredientc)
-      res.isDefined must beTrue 
-      res.get.user.email must beGreaterThanOrEqualTo(user.email)
+      res must beTrue 
+      // res.get.user.email must beGreaterThanOrEqualTo(user.email)
     }
 
     "retrive consumed ingredients by email" in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {

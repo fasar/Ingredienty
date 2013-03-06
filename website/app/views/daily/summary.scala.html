@@ -49,7 +49,7 @@
   <- </a>
    @calendar.add(Calendar.DAY_OF_MONTH, 1)
   </div>  
-    @helper.form(action = controllers.website.routes.Application.addIngredient(Global.regexDate.findFirstIn(request.path).getOrElse("")), 'id -> "addIngredient") {
+    @helper.form(action = controllers.website.routes.Application.addConsumedIngredient(Global.regexDate.findFirstIn(request.path).getOrElse("")), 'id -> "addIngredient") {
         <div class="span3 inputIngredient">
         @inputText(myForm("id"), '_label -> "Id")
         </div>
@@ -81,10 +81,8 @@
           <th>Heure</th>
           <th>Quantité</th>
           <th width="300">Nom</th>
+          <th> </th>
           <th>Famille</th>
-          @*<th>Glucides/100gr</th>
-          <th>Lipides/100gr</th>
-          <th>Protéines/100gr</th>*@
           <th>Glucides</th>
           <th>Lipides</th>
           <th>Protéines</th>
@@ -101,11 +99,18 @@
                f"$res%1.2f"
             }
         </td>
-        <td widtd="300">@ing.ingredient.name</td>
+        <td widtd="300">
+            @ing.ingredient.name
+        </td>
+        <td>
+           <a class="btn-mini" href="@controllers.website.routes.Application.deleteConsumedIngredient(
+              Global.dateFormaterYearMountDate.format(calendar.getTime), 
+              Global.dateFormaterHours.format(ing.date), 
+              ing.ingredient.id.get
+              )"><i class="icon-minus-sign"></i></a>
+              
+        </td>
         <td>@{(ing.ingredient.family map {_.name }).getOrElse("");}</td>
-        @*<td>@ing.ingredient("Glucides").getOrElse("Pas de données")</td>
-        <td>@ing.ingredient("Lipides").getOrElse("Pas de données")</td>
-        <td>@ing.ingredient("Protéines").getOrElse("Pas de données")</td>*@
         <td>@{
                val res = ing.ingredient.glucides.getOrElse(0.0) * ing.quantity / 100.0;
                f"$res%1.2f"
@@ -138,9 +143,7 @@
         <td></td>
         <td>Total : </td>
         <td></td>
-        @*<td>Glucides/100gr</td>
-        <td>Lipides/100gr</td>
-        <td>Protéines/100gr</td>*@
+        <td></td>
         @{
           Html(f"""
           <td>${glucides_lipides_proteines._1}%1.2f</td>
@@ -155,9 +158,7 @@
         <td></td>
         <td>Total : </td>
         <td></td>
-        @*<td>Glucides/100gr</td>
-        <td>Lipides/100gr</td>
-        <td>Protéines/100gr</td>*@
+        <td></td>
         @{
           val glu = glucides_lipides_proteines._1
           val lip = glucides_lipides_proteines._2

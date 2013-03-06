@@ -70,6 +70,6 @@ object IngredientCtrl extends Controller {
   }
 
   def ingredientCherche() = TODO
+ 
   
-
 }

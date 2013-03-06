@@ -1,5 +1,6 @@
 package models.website
 
+import java.util.Date
 import play.api.data.Form
 import models.Recipe
 import play.api.data.Forms._
@@ -58,6 +59,15 @@ object RecipeHelper {
         recipe.isPublic, recipe.description, recipe.prepTimeSec,
         recipe.cookTimeSec, ingredients)
     }
-
+  )
+  
+  val addRecipeToDailyForm: Form[(Long, String, BigDecimal, Option[Date], Option[Date])] = Form(
+    tuple(
+      "id" -> longNumber,
+      "name" -> text,
+      "quantity" -> bigDecimal,
+      "date" -> optional(date("dd-MM-yyyy")),
+      "hour" -> optional(date("HH:mm"))
+    )
   )
 }

@@ -24,11 +24,14 @@ GET     /recette/:id/edit                   controllers.website.RecipeCtrl.edit(
 GET     /recette/:id/delete                 controllers.website.RecipeCtrl.delete(id:Long)
 
 # Home page
-GET     /                           controllers.website.Application.index(date = "")
-GET     /:date                      controllers.website.Application.index(date)
-POST    /addIngredient/             controllers.website.Application.addIngredient(date = "")
-POST    /addIngredient/:date        controllers.website.Application.addIngredient(date)
-
+GET     /                                   controllers.website.Application.index(date = "")
+GET     /:date/:hour/:idIngredient/delete   controllers.website.Application.deleteConsumedIngredient(date:String, hour:String, idIngredient:Long)
+GET     /:date                              controllers.website.Application.index(date)
+POST    /addIngredient/                     controllers.website.Application.addConsumedIngredient(date = "")
+POST    /:date/addIngredient/               controllers.website.Application.addConsumedIngredient(date)
+GET     /addRecipe/:recipeId                controllers.website.Application.showAddRecipeForm(date = "", recipeId:Long)
+GET     /:date/addRecipe/:recipeId          controllers.website.Application.showAddRecipeForm(date, recipeId:Long)
+POST    /addRecipe                          controllers.website.Application.addRecipe()
 
 
 ## Map static resources from the /public folder to the /assets URL path

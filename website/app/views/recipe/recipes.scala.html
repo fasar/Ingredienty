@@ -31,12 +31,19 @@
     <td>@recette.cookTimeSec</td>
     <td>@{recette.author.map{_.name}.getOrElse("")}</td>
     <td>
+     <div>
+      <a href="@controllers.website.routes.Application.showAddRecipeForm("", recette.id.get)">
+        <button class="btn btn-primary" type="button">Ajouter ses ingredients</button>
+      </a>
+     </div>
+     <div>
       <a href="@controllers.website.routes.RecipeCtrl.edit(recette.id.get)">
-        <button class="btn btn-primary" type="button">Éditer</button>
+        <button class="btn" type="button">Éditer</button>
       </a>
       <a href="@controllers.website.routes.RecipeCtrl.delete(recette.id.get)">
         <button class="btn btn-danger" type="button">Supprimer</button>
       </a>
+      </div>
     </td>
   </tr>
  }
