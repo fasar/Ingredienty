@@ -70,7 +70,8 @@ object WeightDao {
     DB.withConnection { implicit connection =>
       SQL("select id, email, date, weight, fat, water, " +
       		"muscles, bones, visceralFat from Weight "+
-      		"where email = {email}")
+      		"where email = {email}" +
+      		"ORDER BY date DESC")
         .on('email -> email)
         .as(simple *)
     }
@@ -88,11 +89,11 @@ object WeightDao {
       val res = SQL(
         """
           insert into Weight 
-          (email, date, weight, fat, water,
-      		"muscles, bones, visceralFat)
+          (email, date, weight, fat,
+      		water, muscles, bones, visceralFat)
           values (
-            {ingredient_id}, {date}, {email}, {cdate},
-            {recipe_id}, {quantity}
+            {email}, {date}, {weight}, {fat},
+            {water}, {muscles}, {bones} ,{visceralFat}
           )
         """
       ).on(

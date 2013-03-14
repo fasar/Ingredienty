@@ -24,8 +24,13 @@ GET     /recette/:id/edit                   controllers.website.RecipeCtrl.edit(
 GET     /recette/:id/delete                 controllers.website.RecipeCtrl.delete(id:Long)
 
 # Weight pages
-GET     /poids/:date                        controllers.website.WeightCtrl.index(date)
-GET     /poids                              controllers.website.WeightCtrl.index(date ="")
+GET     /poids/delete/:id/                  controllers.website.WeightCtrl.deleteWeight(id:Long)
+GET     /poids/ajout                        controllers.website.WeightCtrl.addRecipeForm()
+POST    /poids/ajout                        controllers.website.WeightCtrl.addRecipe()
+GET     /poids                              controllers.website.WeightCtrl.index()
+
+
+
 
 # Home page
 GET     /                                   controllers.website.Application.index(date = "")

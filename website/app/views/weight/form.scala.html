@@ -1,0 +1,43 @@
+@(myForm: Form[models.website.WeightHelper.WeightFormObj]) 
+
+@import helper._
+@import helper.twitterBootstrap._
+@import controllers.website._
+@import java.util.Date
+
+
+@main("Entrer un nouveau poids", navRub = "weight") {
+
+@if(myForm.hasErrors) {
+<div class="alert-message error">
+ <p>
+  <strong>Oops</strong> Please fix all errors
+ </p>
+</div>
+} 
+
+@helper.form(action = controllers.website.routes.WeightCtrl.addRecipe, 'id -> "weightForm") {
+
+<fieldset>
+ <legend>Informations</legend> 
+   <div class="hidden_field">
+     @helper.inputText(myForm("id")) 
+   </div>
+   @helper.inputDate(myForm("date"), '_label -> "Date")
+   @helper.inputText(myForm("weight"), '_label -> "Poid (Kgr)")
+   @helper.inputText(myForm("fat"), '_label -> "Graisse (%)")
+   @helper.inputText(myForm("water"), '_label -> "Eau (%)")
+   @helper.inputText(myForm("muscles"), '_label -> "Muscle (Kgr)")
+   @helper.inputText(myForm("bones"), '_label -> "Os (Kgr)")
+   @helper.inputText(myForm("visceralFat"), '_label -> "Graisses viscérales (indice)")
+</fieldset>
+
+
+<div class="actions">
+ <input type="submit" class="btn primary" value="Enregistrer"> <a
+  href="@controllers.website.routes.WeightCtrl.index" class="btn">Annuler</a>
+</div>
+
+}@* end helper.form *@
+
+}@* end main*@

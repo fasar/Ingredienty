@@ -35,7 +35,8 @@
 
 
 @main("Affichage des ingrédients consommés", 
-     f"""Journée du ${DateFormat.getDateInstance().format(currentDate)} : $total%1.0f kcal"""
+     f"""Journée du ${DateFormat.getDateInstance().format(currentDate)} : $total%1.0f kcal""", 
+     navRub = "main"
      ) {
 
 <section id="addAnIngredient">

@@ -3,7 +3,7 @@
 # --- !Ups
 
 create table Weight (
-  id                        bigint not null,
+  id                        bigint not null auto_increment,
   email                     varchar(255) not null,
   date                      timestamp not null,
   weight                    double not null,
