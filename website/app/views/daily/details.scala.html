@@ -1,0 +1,238 @@
+@(currentDate: java.util.Date, 
+   pingredients: List[IngredientConsumed], 
+   myForm:Form[(Long, BigDecimal, Option[java.util.Date], Option[java.util.Date])]
+ )(
+   implicit request: RequestHeader
+ )
+ 
+@import java.util.Date
+@import java.util.Calendar
+@import java.text.DateFormat
+@import views.html._
+@import helper._
+@import models.website.IngredientConsumedHelper
+@import controllers.website.Utils.DateUtils
+
+@* ==== Defining a global data with Glucides, Proteines and Lipides ====*@
+@defining({
+  val glucides_lipides_proteines = pingredients.foldLeft((0.0, 0.0, 0.0)) { 
+    case((glucAc, lipAc, protAc), elem) => 
+       val gluc = (elem.ingredient.glucides.getOrElse(0.0) * elem.quantity / 100.0)
+       val lip = (elem.ingredient.lipides.getOrElse(0.0) * elem.quantity / 100.0)
+       val prot = (elem.ingredient.proteines.getOrElse(0.0) * elem.quantity / 100.0)
+       (glucAc+gluc, lipAc+lip, protAc+prot)
+  }
+  
+  val glu = glucides_lipides_proteines._1;
+  val lip = glucides_lipides_proteines._2;
+  val pro = glucides_lipides_proteines._3;
+  val total = glu*4 + lip*9 + pro*4;
+  
+  val calendar = Calendar.getInstance()
+  calendar.setTime(currentDate)
+  (glucides_lipides_proteines, calendar, total)
+}){ case (glucides_lipides_proteines, calendar, total) =>
+
+
+@main("Affichage des ingrédients consommés", 
+     f"""Journée du ${DateUtils.dateFormaterDays.format(currentDate)} : $total%1.0f kcal""",
+     navRub = "main"
+     ) {
+
+<section id="addAnIngredient">
+<div class="row">
+  <div class="span1">
+  @calendar.add(Calendar.MONTH, -1)
+  <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
+  <<- </a> <br>
+  @calendar.add(Calendar.MONTH, 1) @calendar.add(Calendar.DAY_OF_MONTH, -1)
+  <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
+  <- </a>
+   @calendar.add(Calendar.DAY_OF_MONTH, 1)
+  </div>  
+    @helper.form(action = controllers.website.routes.Application.addConsumedIngredient(DateUtils.regexDate.findFirstIn(request.path).getOrElse("")), 'id -> "addIngredient") {
+        <div class="span3 inputIngredient">
+        @inputText(myForm("id"), '_label -> "Id")
+        </div>
+        <div class="span2 offset1">
+        @inputText(myForm("quantity"), '_label -> "Quantité", 'class -> "input-small")
+        </div>
+        <div class="span2">
+        @inputText(myForm("hour"), '_label -> "Heure", 'value -> (new Date()), 'class -> "input-small")
+        </div>
+        
+        <div class="span1">
+            @calendar.add(Calendar.MONTH, 1)
+            <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
+            ->> </a> <br>
+            @calendar.add(Calendar.MONTH, -1) @calendar.add(Calendar.DAY_OF_MONTH, 1)
+            <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
+            -> </a>
+            @calendar.add(Calendar.DAY_OF_MONTH, -1)
+        <input type="submit" class="btn primary" value="Ajouter"> 
+        </div>
+    }
+</div>
+</section> 
+
+<section id="showIngredientsConsomed">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Heure</th>
+          <th>Quantité</th>
+          <th width="300">Nom</th>
+          <th> </th>
+          <th>Famille</th>
+          <th>Glucides</th>
+          <th>Lipides</th>
+          <th>Protéines</th>
+          <th>Calories</th>
+        </tr>
+      </thead>
+      <tbody>
+       @for(ing <- pingredients) {
+        <tr>
+        <td>@DateUtils.dateFormaterHours.format(ing.date)</td>
+        <td>
+            @{
+               val res = ing.quantity;
+               f"$res%1.2f"
+            }
+        </td>
+        <td widtd="300">
+            @ing.ingredient.name
+        </td>
+        <td>
+           <a class="btn-mini" href="@controllers.website.routes.Application.deleteConsumedIngredient(
+              DateUtils.dateFormaterYearMountDate.format(calendar.getTime),
+              DateUtils.dateFormaterHours.format(ing.date),
+              ing.ingredient.id.get
+              )"><i class="icon-minus-sign"></i></a>
+              
+        </td>
+        <td>@{(ing.ingredient.family map {_.name }).getOrElse("");}</td>
+        <td>@{
+               val res = ing.ingredient.glucides.getOrElse(0.0) * ing.quantity / 100.0;
+               f"$res%1.2f"
+             }
+        </td>
+        <td>@{
+               val res = ing.ingredient.lipides.getOrElse(0.0) * ing.quantity / 100.0;
+               f"$res%1.2f"
+             }
+        </td>
+        <td>@{
+               val res = ing.ingredient.proteines.getOrElse(0.0) * ing.quantity / 100.0;
+               f"$res%1.2f"
+             }
+        </td>
+        <td>@{
+               val glu = (ing.ingredient.glucides.getOrElse(0.0) * ing.quantity / 100.0)*4;
+               val lip = (ing.ingredient.lipides.getOrElse(0.0) * ing.quantity / 100.0)*9;
+               val pro = (ing.ingredient.proteines.getOrElse(0.0) * ing.quantity / 100.0)*4;
+               val res = glu + lip + pro
+               f"${res}%1.2f" 
+              }
+        </td>
+       </tr>
+      }
+      </tbody>
+      <tfoot>
+       <tr>
+        <td></td>
+        <td></td>
+        <td>Total : </td>
+        <td></td>
+        <td></td>
+        @{
+          Html(f"""
+          <td>${glucides_lipides_proteines._1}%1.2f</td>
+          <td>${glucides_lipides_proteines._2}%1.2f</td>
+          <td>${glucides_lipides_proteines._3}%1.2f</td>
+          <td>${glucides_lipides_proteines._1*4+glucides_lipides_proteines._2*9+glucides_lipides_proteines._3*4}%1.2f</td>
+          """)
+        }
+       </tr>
+       <tr>
+        <td></td>
+        <td></td>
+        <td>Total : </td>
+        <td></td>
+        <td></td>
+        @{
+          val glu = glucides_lipides_proteines._1
+          val lip = glucides_lipides_proteines._2
+          val pro = glucides_lipides_proteines._3
+          val total = glu + lip + pro
+          val gluprc = (glu / total * 100)
+          val lipprc = (lip / total * 100)
+          val proprc = (pro / total * 100)
+          Html(f"""
+          <td>$gluprc%1.2f%</td>
+          <td>$lipprc%1.2f%</td>
+          <td>$proprc%1.2f%</td>
+          """)
+        }
+        <td></td>
+       </tr>
+      </tfoot>
+     </table>
+</section>
+
+<section id="summary">
+Vous avez pris : @{f"$total%1.0f"} kcal
+</section>
+
+<section id="showGraph">
+    <style type="text/css">
+    	div.graph
+    	{
+    		width: 400px;
+    		height: 300px;
+    		border: 1px dashed gainsboro;
+    	}
+    </style>
+    <center>
+        <div id="default" class="graph"></div>
+    </center>
+    
+    <script type="text/javascript" charset="utf-8">   
+        var data = [];
+    	data[0] = { label: "Glucides", data: @{glucides_lipides_proteines._1} };
+    	data[1] = { label: "Lipides", data: @{glucides_lipides_proteines._2} };
+    	data[2] = { label: "Protéines", data: @{glucides_lipides_proteines._3} };
+    
+    
+    	// DEFAULT
+        $.plot($("#default"), data, 
+    	{
+    		series: {
+    			pie: { 
+    				show: true
+    			}
+    		}
+    	});
+    	
+    </script>
+</section>
+
+<script type="text/javascript" charset="utf-8">
+
+
+// -- renumber fields
+   
+    var addAutoCompletion = function() {
+        $('div.inputIngredient >* input').each(function(index, element) {
+            $(this).autocomplete({
+                source:  "http://localhost:9000/ingredients/startwith.json",
+                minLength: 3
+            });
+        })
+    }
+    $(function() {
+           addAutoCompletion();
+    })
+</script>
+}@*end main*@
+}@*end defining*@
