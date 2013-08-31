@@ -8,12 +8,12 @@
 @import views.html._
 @import helper._
 @import models.website.IngredientConsumedHelper
-@import controllers.website.Global
+@import controllers.website.Utils.DateUtils
 
 
 @main("Évolution du poids", 
      f"""""",
-     navRub = "weight") {
+     navRub = views.EnumNavRub.WEIGHT) {
 
 <a href="@controllers.website.routes.WeightCtrl.addRecipeForm" class="btn">Ajouter</a>
 
@@ -34,7 +34,7 @@
       <tbody>
        @for(weight <- pweights) {
         <tr>
-            <td>@Global.dateFormaterDays.format(weight.date)</td>
+            <td>@DateUtils.dateFormaterDays.format(weight.date)</td>
             <td>@weight.weight</td>
             <td>@weight.fat</td>
             <td>@weight.water</td>

@@ -11,7 +11,7 @@
 @import views.html._
 @import helper._
 @import models.website.IngredientConsumedHelper
-@import controllers.website.Global
+@import controllers.website.Utils.DateUtils
 
 @* ==== Defining a global data with Glucides, Proteines and Lipides ====*@
 @defining({
@@ -35,22 +35,22 @@
 
 
 @main("Affichage des ingrédients consommés", 
-     f"""Journée du ${DateFormat.getDateInstance().format(currentDate)} : $total%1.0f kcal""", 
-     navRub = "main"
+     f"""Journée du ${DateUtils.dateFormaterDays.format(currentDate)} : $total%1.0f kcal""",
+    views.EnumNavRub.MAIN
      ) {
 
 <section id="addAnIngredient">
 <div class="row">
   <div class="span1">
   @calendar.add(Calendar.MONTH, -1)
-  <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+  <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
   <<- </a> <br>
   @calendar.add(Calendar.MONTH, 1) @calendar.add(Calendar.DAY_OF_MONTH, -1)
-  <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+  <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
   <- </a>
    @calendar.add(Calendar.DAY_OF_MONTH, 1)
   </div>  
-    @helper.form(action = controllers.website.routes.Application.addConsumedIngredient(Global.regexDate.findFirstIn(request.path).getOrElse("")), 'id -> "addIngredient") {
+    @helper.form(action = controllers.website.routes.Application.addConsumedIngredient(DateUtils.regexDate.findFirstIn(request.path).getOrElse("")), 'id -> "addIngredient") {
         <div class="span3 inputIngredient">
         @inputText(myForm("id"), '_label -> "Id")
         </div>
@@ -63,10 +63,10 @@
         
         <div class="span1">
             @calendar.add(Calendar.MONTH, 1)
-            <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+            <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
             ->> </a> <br>
             @calendar.add(Calendar.MONTH, -1) @calendar.add(Calendar.DAY_OF_MONTH, 1)
-            <a href="@controllers.website.routes.Application.index(Global.dateFormaterYearMountDate.format(calendar.getTime))">
+            <a href="@controllers.website.routes.Application.index(DateUtils.dateFormaterYearMountDate.format(calendar.getTime))">
             -> </a>
             @calendar.add(Calendar.DAY_OF_MONTH, -1)
         <input type="submit" class="btn primary" value="Ajouter"> 
@@ -93,7 +93,7 @@
       <tbody>
        @for(ing <- pingredients) {
         <tr>
-        <td>@Global.dateFormaterHours.format(ing.date)</td>
+        <td>@DateUtils.dateFormaterHours.format(ing.date)</td>
         <td>
             @{
                val res = ing.quantity;
@@ -105,8 +105,8 @@
         </td>
         <td>
            <a class="btn-mini" href="@controllers.website.routes.Application.deleteConsumedIngredient(
-              Global.dateFormaterYearMountDate.format(calendar.getTime), 
-              Global.dateFormaterHours.format(ing.date), 
+              DateUtils.dateFormaterYearMountDate.format(calendar.getTime),
+              DateUtils.dateFormaterHours.format(ing.date),
               ing.ingredient.id.get
               )"><i class="icon-minus-sign"></i></a>
               

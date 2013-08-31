@@ -2,7 +2,7 @@
 @import models.dao._
 @{val ingredientProperties = IngredientPropertyDao.findAll}
 
-@main("List des ingrédients", navRub="ingredients"){
+@main("List des ingrédients", navRub=views.EnumNavRub.INGREDIENTS){
  <table class="table table-bordered">
      <thead>
      <tr>

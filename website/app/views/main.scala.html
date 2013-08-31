@@ -1,4 +1,4 @@
-@(title: String, titleComplement:String="", navRub:String="")(content: Html)
+@(title: String, titleComplement:String="", navRub:views.EnumNavRub.EnumNavRub=views.EnumNavRub.MAIN)(content: Html)
 <!DOCTYPE html>
 <html>
  <head>
@@ -11,7 +11,7 @@
     <script src="@controllers.website.routes.Assets.at("javascripts/jquery.flot.js")"></script>
     <script src="@controllers.website.routes.Assets.at("javascripts/jquery.flot.pie.js")"></script>
  </head>
-
+ @import views.EnumNavRub
  <body>
  
   <!-- Navbar
@@ -21,13 +21,13 @@
       <div class="container">
           <a class="brand" href="@controllers.website.routes.Application.index("")">Ingredienty</a>
           <ul class="nav">
-              <li class="@if(navRub=="recipes"){active}">
+              <li class="@if(navRub==views.EnumNavRub.RECIPES){active}">
               <a href="@controllers.website.routes.RecipeCtrl.recipes()">Recettes</a>
               </li>
-              <li class="@if(navRub=="ingredients"){active}">
+              <li class="@if(navRub==views.EnumNavRub.INGREDIENTS){active}">
               <a href="@controllers.website.routes.IngredientCtrl.ingredients">Ingredients</a>
               </li>
-              <li class="@if(navRub=="weight"){active}">
+              <li class="@if(navRub==views.EnumNavRub.WEIGHT){active}">
               <a href="@controllers.website.routes.WeightCtrl.index">Poids</a>
               </li>
           </ul>
