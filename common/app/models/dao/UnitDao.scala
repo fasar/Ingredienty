@@ -32,6 +32,17 @@ object UnitDao {
   }
 
   /**
+   * Retrieve all unit from the id.
+   */
+  def mapUnit:Map[Long, Unit] = {
+    val units: List[Unit] = findAll
+    val res = (for(unit <- units) yield {
+      (unit.id.get, unit)
+    }).toMap
+    res
+  }
+
+  /**
    * Retrieve an unit from the id.
    */
   def findById(id: Long): Option[Unit] = {

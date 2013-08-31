@@ -41,6 +41,7 @@ POST    /:date/addIngredient/               controllers.website.Application.addC
 GET     /addRecipe/:recipeId                controllers.website.Application.showAddRecipeForm(date = "", recipeId:Long)
 GET     /:date/addRecipe/:recipeId          controllers.website.Application.showAddRecipeForm(date, recipeId:Long)
 POST    /addRecipe                          controllers.website.Application.addRecipe()
+GET     /:date/details                      controllers.website.Application.showDetails(date: String)
 
 
 ## Map static resources from the /public folder to the /assets URL path

@@ -11,7 +11,7 @@
 @import views.html._
 @import helper._
 @import models.website.IngredientConsumedHelper
-@import controllers.website.Utils.DateUtils
+@import controllers.website.utils.DateUtils
 
 @* ==== Defining a global data with Glucides, Proteines and Lipides ====*@
 @defining({
@@ -181,8 +181,14 @@
 </section>
 
 <section id="summary">
-Vous avez pris : @{f"$total%1.0f"} kcal
+<div id="caloriesSupply">
+    Vous avez pris : @{f"$total%1.0f"} kcal
+</div>
+<div id="details">
+    <a href="@controllers.website.routes.Application.showDetails(DateUtils.dateUrlFormater.format(currentDate))">details</a>
+</div>
 </section>
+
 
 <section id="showGraph">
     <style type="text/css">

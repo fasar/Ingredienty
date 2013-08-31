@@ -10,6 +10,7 @@ import anorm._
 import java.util.{Date, Calendar}
 import java.text._
 import play.api.data.Form
+import controllers.website.utils.DateUtils
 
 
 object WeightCtrl extends Controller {
@@ -31,7 +32,7 @@ object WeightCtrl extends Controller {
 
   def addRecipeForm() = Action { implicit req =>
     val form:Form[WeightFormObj] = WeightHelper.weightForm
-    val dateSrc = Global.dateFormFormater.format(new Date)
+    val dateSrc = DateUtils.dateFormFormater.format(new Date)
     val formRes = form.bind(Map("date" -> dateSrc)).discardingErrors
     showAddRecipe(formRes)
   }

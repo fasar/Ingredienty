@@ -13,9 +13,11 @@ import java.util.{Date, Calendar}
 import java.text._
 import play.api.data.Form
 import models.website.RecipeHelper
+import controllers.website.utils.DateUtils
 import org.omg.CosNaming.NamingContextPackage.NotFound
+import business.ingredients.properties.UtilsIngredients
 
- 
+
 object Application extends Controller {
   private val log = Logger(Application.getClass)
   
@@ -26,7 +28,7 @@ object Application extends Controller {
     log.debug(s"get index page of date ${req.path}")
     if(date != "") {
         try {
-    	val myDate = Global.dateFormaterYearMountDate.parse(date)
+    	val myDate = DateUtils.dateUrlFormater.parse(date)
     	showSummary(currentDate = myDate)
         } catch {
           case e:Exception => 
@@ -87,12 +89,12 @@ object Application extends Controller {
   
   private def getCalendarFromString(datep:String): Calendar = {
     val calendar:Calendar = try {
-	val myDate = Global.dateFormaterYearMountDate.parse(datep)
-	val res = Calendar.getInstance()
-	res.setTime(myDate)
-	res
+      val myDate = DateUtils.dateUrlFormater.parse(datep)
+      val res = Calendar.getInstance()
+      res.setTime(myDate)
+      res
     } catch {
-      case e:Exception => 
+      case e:Exception =>
         val res = Calendar.getInstance();
         res.set(Calendar.SECOND, 0)
         res.set(Calendar.MILLISECOND, 0)
@@ -101,11 +103,10 @@ object Application extends Controller {
     calendar
   }
   
-  
   def deleteConsumedIngredient(datep:String, hourp:String, idIngredient:Long) = Action {
     log.debug(s"delete ingredient $idIngredient cosumed at $datep $hourp")
     val calendar:Calendar = getCalendarFromString(datep)
-    val hour = Global.dateFormaterHours.parse(hourp)
+    val hour = DateUtils.dateFormaterHours.parse(hourp)
     val calHour = Calendar.getInstance
     calHour.setTime(hour)
     calendar.set(Calendar.HOUR_OF_DAY, calHour.get(Calendar.HOUR_OF_DAY))
@@ -119,15 +120,15 @@ object Application extends Controller {
   def showAddRecipeForm(datep:String, recipeId:Long) = Action { implicit request => 
     log.debug(s"get a form for add a recipe $recipeId at date $datep")
     val date = 
-      if(Global.regexDate.findFirstIn(datep).isDefined) {
-	  val dated = Global.dateFormaterYearMountDate.parse(datep)
-	  Global.dateFormFormater.format(dated)
+      if(DateUtils.regexDate.findFirstIn(datep).isDefined) {
+	      val dated = DateUtils.dateUrlFormater.parse(datep)
+        DateUtils.dateFormFormater.format(dated)
       } else ""
     val form = RecipeHelper.addRecipeToDailyForm
     val recipeOpt = RecipeDao.findById(recipeId)
     if(recipeOpt.isDefined) {
       val recipe = recipeOpt.get
-      val hour = Global.dateFormaterHours.format(new Date)
+      val hour = DateUtils.dateFormaterHours.format(new Date)
       val defaultValues = Map("id" -> recipeId.toString, 
           "name" -> recipe.name, "date" -> date, 
           "hour" -> hour)
@@ -138,8 +139,6 @@ object Application extends Controller {
 	NotFound
     }
   }
-  
-
   
   
   def addRecipe() = Action { implicit request => 
@@ -152,7 +151,7 @@ object Application extends Controller {
         val quantityDb = quantityBD.toDouble
         val calendar = getCalendar(dateOpt, hourOpt)
         val date = calendar.getTime
-        val dateStr = Global.dateFormaterAll.format(date)
+        val dateStr = DateUtils.dateFormaterAll.format(date)
         log.debug(f"add recipe id $id at date $dateStr with quantity $quantityDb%1.2f")
         val recipeOpt = RecipeDao.findById(id)
         if(recipeOpt.isDefined) {
@@ -168,19 +167,19 @@ object Application extends Controller {
               IngredientConsumed(user, date, qi._1, quantity, recipeOpt)
             }
           IngredientConsumedDao.insert(quantityIngredients)
-          Redirect(routes.Application.index(Global.dateFormaterYearMountDate.format(date)))
+          Redirect(routes.Application.index(DateUtils.dateUrlFormater.format(date)))
         } else {
           log.debug(f"can't add recipe because id $id is not found")
-          Redirect(routes.Application.index(Global.dateFormaterYearMountDate.format(date)))
+          Redirect(routes.Application.index(DateUtils.dateUrlFormater.format(date)))
         }
       }
     )
   }
   
-  private def getCalendar(datep:Option[String], hourp:Option[String]): Calendar = {
+  private def getCalendar2(datep:Option[String], hourp:Option[String]): Calendar = {
     val calDay:Calendar = getCalendarFromString(datep.getOrElse(""))
     val calHour = if(hourp.isDefined) {
-      val hour = Global.dateFormaterHours.parse(hourp.get)
+      val hour = DateUtils.dateFormaterHours.parse(hourp.get)
       val cal = Calendar.getInstance
       cal.setTime(hour)
       cal
@@ -208,4 +207,16 @@ object Application extends Controller {
     calDay.set(Calendar.MILLISECOND, 0)
     calDay
   }
+
+  def showDetails(datep:String) = Action { implicit request =>
+    log.debug(s"show details about the day : $datep")
+    val date: Date =
+      if(DateUtils.regexDate.findFirstIn(datep).isDefined) {
+        DateUtils.dateUrlFormater.parse(datep)
+      } else Calendar.getInstance().getTime
+    val IngPptMap = UtilsIngredients.calcApport(user, date)
+
+    Ok(views.html.daily.details(date, IngPptMap))
+  }
 }
+
