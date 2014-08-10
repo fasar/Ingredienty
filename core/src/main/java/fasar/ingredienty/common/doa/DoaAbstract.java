@@ -3,7 +3,7 @@ package fasar.ingredienty.common.doa;
 /**
  * Created by fabien_s on 10/08/2014.
  */
-public interface DaoAbstract<E> {
+public interface DoaAbstract<E> {
 
     public Iterable<E> findAll();
 
